@@ -1,0 +1,26 @@
+# .NET
+**/bin/
+**/obj/
+*.user
+*.suo
+.vs/
+
+# EF migrations (keep structure, not snapshots auto-generated)
+
+# Node
+node_modules/
+dist/
+.env
+.env.local
+
+# Secrets
+appsettings.Development.json
+
+# Other
+.claude
+claude.md
+docs/
+appsettings*.json
+mlruns/
+launchSettings*.json
+docker-compose.yml
