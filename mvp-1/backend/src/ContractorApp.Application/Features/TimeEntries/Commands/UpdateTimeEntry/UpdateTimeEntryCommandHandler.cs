@@ -34,8 +34,8 @@ public class UpdateTimeEntryCommandHandler : IRequestHandler<UpdateTimeEntryComm
         if (entry.IsInvoiced)
             throw new DomainException("Nie można edytować zafakturowanego wpisu.");
 
-        if (entry.IsRunning)
-            throw new DomainException("Nie można edytować aktywnego timera.");
+        if (entry.StoppedAt == null)
+            throw new DomainException("Nie można edytować aktywnego lub wstrzymanego timera.");
 
         var project = await _db.Projects
             .Include(p => p.Client)

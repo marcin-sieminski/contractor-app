@@ -39,7 +39,7 @@ export function TimeEntryList() {
 
   if (isLoading) return <div className="text-gray-500 text-sm p-4">Ładowanie...</div>
 
-  const grouped = groupByDate(entries.filter(e => !e.isRunning))
+  const grouped = groupByDate(entries.filter(e => !e.isRunning && !e.isPaused))
 
   if (grouped.size === 0)
     return <div className="text-gray-400 text-sm p-4 text-center">Brak wpisów. Uruchom timer lub dodaj ręcznie.</div>

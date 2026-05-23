@@ -13,6 +13,12 @@ export const startTimer = (projectId: string, description: string) =>
 export const stopTimer = (id: string) =>
   api.post<TimeEntry>(`/time-entries/${id}/stop`).then(r => r.data)
 
+export const pauseTimer = (id: string) =>
+  api.post<TimeEntry>(`/time-entries/${id}/pause`).then(r => r.data)
+
+export const resumeTimer = (id: string) =>
+  api.post<TimeEntry>(`/time-entries/${id}/resume`).then(r => r.data)
+
 export const createManualEntry = (data: { projectId: string; startedAt: string; stoppedAt: string; description: string }) =>
   api.post<TimeEntry>('/time-entries/manual', data).then(r => r.data)
 

@@ -1,39 +1,21 @@
 import { useState } from 'react'
-import { Play, Square } from 'lucide-react'
+import { Play } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
-import { useTimer, formatElapsed } from '../../hooks/useTimer'
+import { useTimer } from '../../hooks/useTimer'
 import { getProjects } from '../../api/clients'
 
 export function TimerWidget() {
-  const { activeEntry, elapsed, isRunning, start, stop, isStarting, isStopping } = useTimer()
+  const { isRunning, isPaused, start, isStarting } = useTimer()
   const { data: projects = [] } = useQuery({ queryKey: ['projects'], queryFn: () => getProjects() })
   const [projectId, setProjectId] = useState('')
   const [description, setDescription] = useState('')
+
+  if (isRunning || isPaused) return null
 
   const handleStart = () => {
     if (!projectId) return
     start({ projectId, description })
     setDescription('')
-  }
-
-  if (isRunning && activeEntry) {
-    return (
-      <div className="bg-blue-600 text-white rounded-xl p-4 flex items-center gap-4">
-        <div className="font-mono text-3xl font-bold">{formatElapsed(elapsed)}</div>
-        <div className="flex-1">
-          <div className="font-medium">{activeEntry.projectName}</div>
-          <div className="text-blue-200 text-sm">{activeEntry.clientName}</div>
-          {activeEntry.description && <div className="text-blue-100 text-sm mt-1">{activeEntry.description}</div>}
-        </div>
-        <button
-          onClick={stop}
-          disabled={isStopping}
-          className="bg-white text-blue-600 hover:bg-blue-50 px-4 py-2 rounded-lg font-medium flex items-center gap-2 disabled:opacity-50"
-        >
-          <Square size={16} /> Zatrzymaj
-        </button>
-      </div>
-    )
   }
 
   return (

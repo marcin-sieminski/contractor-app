@@ -12,15 +12,33 @@ public class TimeEntry : Entity
     public bool IsInvoiced { get; set; }
     public Guid? InvoiceId { get; set; }
     public DateTimeOffset? DeletedAt { get; set; }
+    public bool IsPaused { get; set; }
+    public int AccumulatedSeconds { get; set; }
 
     public Project Project { get; set; } = null!;
 
-    public bool IsRunning => StoppedAt is null;
+    public bool IsRunning => StoppedAt is null && !IsPaused;
+
+    public void Pause(DateTimeOffset now)
+    {
+        AccumulatedSeconds += (int)(now - StartedAt).TotalSeconds;
+        IsPaused = true;
+        UpdatedAt = DateTimeOffset.UtcNow;
+    }
+
+    public void Resume(DateTimeOffset now)
+    {
+        StartedAt = now;
+        IsPaused = false;
+        UpdatedAt = DateTimeOffset.UtcNow;
+    }
 
     public void Stop(DateTimeOffset stoppedAt)
     {
+        var currentSegmentSeconds = IsPaused ? 0 : (int)(stoppedAt - StartedAt).TotalSeconds;
+        DurationMinutes = (int)Math.Round((AccumulatedSeconds + currentSegmentSeconds) / 60.0);
         StoppedAt = stoppedAt;
-        DurationMinutes = (int)(stoppedAt - StartedAt).TotalMinutes;
+        IsPaused = false;
         UpdatedAt = DateTimeOffset.UtcNow;
     }
 

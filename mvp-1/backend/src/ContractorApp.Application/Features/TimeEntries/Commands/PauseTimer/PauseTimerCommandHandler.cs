@@ -4,20 +4,20 @@ using ContractorApp.Domain.Exceptions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace ContractorApp.Application.Features.TimeEntries.Commands.StopTimer;
+namespace ContractorApp.Application.Features.TimeEntries.Commands.PauseTimer;
 
-public class StopTimerCommandHandler : IRequestHandler<StopTimerCommand, TimeEntryDto>
+public class PauseTimerCommandHandler : IRequestHandler<PauseTimerCommand, TimeEntryDto>
 {
     private readonly IApplicationDbContext _db;
     private readonly ICurrentUserService _currentUser;
 
-    public StopTimerCommandHandler(IApplicationDbContext db, ICurrentUserService currentUser)
+    public PauseTimerCommandHandler(IApplicationDbContext db, ICurrentUserService currentUser)
     {
         _db = db;
         _currentUser = currentUser;
     }
 
-    public async Task<TimeEntryDto> Handle(StopTimerCommand request, CancellationToken cancellationToken)
+    public async Task<TimeEntryDto> Handle(PauseTimerCommand request, CancellationToken cancellationToken)
     {
         var entry = await _db.TimeEntries
             .Include(t => t.Project).ThenInclude(p => p.Client)
@@ -28,10 +28,10 @@ public class StopTimerCommandHandler : IRequestHandler<StopTimerCommand, TimeEnt
                 cancellationToken)
             ?? throw new DomainException($"Wpis czasu {request.TimeEntryId} nie istnieje.");
 
-        if (entry.StoppedAt != null)
-            throw new DomainException("Ten timer już jest zatrzymany.");
+        if (!entry.IsRunning)
+            throw new DomainException("Timer nie jest aktywny.");
 
-        entry.Stop(DateTimeOffset.UtcNow);
+        entry.Pause(DateTimeOffset.UtcNow);
         await _db.SaveChangesAsync(cancellationToken);
 
         return entry.ToDto(entry.Project.Name, entry.Project.Client.Name);

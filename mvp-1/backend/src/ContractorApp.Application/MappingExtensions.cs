@@ -16,7 +16,7 @@ public static class MappingExtensions
     public static TimeEntryDto ToDto(this TimeEntry t, string projectName, string clientName) => new(
         t.Id, t.ProjectId, projectName, clientName,
         t.StartedAt, t.StoppedAt, t.DurationMinutes, t.Description,
-        t.IsInvoiced, t.IsRunning);
+        t.IsInvoiced, t.IsRunning, t.IsPaused, t.AccumulatedSeconds);
 
     public static InvoiceDto ToDto(this Invoice i) => new(
         i.Id, i.InvoiceNumber,

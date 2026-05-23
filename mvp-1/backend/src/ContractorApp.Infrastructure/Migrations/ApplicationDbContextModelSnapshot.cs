@@ -290,6 +290,9 @@ namespace ContractorApp.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<int>("AccumulatedSeconds")
+                        .HasColumnType("integer");
+
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -308,6 +311,9 @@ namespace ContractorApp.Infrastructure.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<bool>("IsInvoiced")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsPaused")
                         .HasColumnType("boolean");
 
                     b.Property<Guid>("ProjectId")

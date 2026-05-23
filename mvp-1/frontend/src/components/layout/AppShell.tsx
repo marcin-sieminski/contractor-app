@@ -1,6 +1,7 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { Clock, Users, FileText, LayoutDashboard, LogOut } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
+import { GlobalTimerBar } from '../timer/GlobalTimerBar'
 
 const nav = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
@@ -43,8 +44,11 @@ export function AppShell() {
           </button>
         </div>
       </aside>
-      <main className="flex-1 overflow-auto">
-        <Outlet />
+      <main className="flex-1 overflow-auto flex flex-col">
+        <GlobalTimerBar />
+        <div className="flex-1 overflow-auto">
+          <Outlet />
+        </div>
       </main>
     </div>
   )
