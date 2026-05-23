@@ -19,7 +19,16 @@ export function DashboardPage() {
 
   const pendingInvoices = invoices.filter(i => i.status === 'Draft').length
   const acceptedInvoices = invoices.filter(i => i.status === 'Accepted')
-  const totalRevenue = acceptedInvoices.reduce((acc, i) => acc + i.totalGross, 0)
+
+  const totalRevenuePLN = acceptedInvoices.reduce((acc, i) => {
+    if (i.currency === 'PLN') return acc + i.totalGross
+    if (i.exchangeRate) return acc + i.totalGross * i.exchangeRate
+    return acc
+  }, 0)
+
+  const missingRateCount = acceptedInvoices.filter(
+    i => i.currency !== 'PLN' && !i.exchangeRate
+  ).length
 
   return (
     <div className="p-6">
@@ -40,7 +49,17 @@ export function DashboardPage() {
         </div>
         <div className="bg-white border border-gray-200 rounded-xl p-4">
           <div className="text-gray-500 text-sm mb-1">Łączny przychód (KSeF)</div>
-          <div className="text-2xl font-bold text-green-600">{totalRevenue.toLocaleString('pl-PL', { maximumFractionDigits: 0 })} PLN</div>
+          <div className="text-2xl font-bold text-green-600">
+            {totalRevenuePLN.toLocaleString('pl-PL', { maximumFractionDigits: 0 })} PLN
+          </div>
+          {missingRateCount > 0 && (
+            <div className="text-xs text-amber-600 mt-1">
+              {missingRateCount} {missingRateCount === 1 ? 'faktura walutowa bez kursu NBP' : 'faktury walutowe bez kursu NBP'}
+            </div>
+          )}
+          {acceptedInvoices.some(i => i.currency !== 'PLN' && i.exchangeRate) && (
+            <div className="text-xs text-gray-400 mt-1">wg kursu NBP z dnia faktury</div>
+          )}
         </div>
       </div>
 
