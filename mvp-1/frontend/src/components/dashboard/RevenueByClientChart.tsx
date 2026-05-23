@@ -1,35 +1,26 @@
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts'
-import type { Invoice } from '../../types/invoice'
+import type { RevenueDataPoint } from '../../types/revenueData'
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#f97316', '#84cc16']
 
-function toPlnGross(inv: Invoice): number {
-  if (inv.currency === 'PLN') return inv.totalGross
-  if (inv.exchangeRate) return inv.totalGross * inv.exchangeRate
-  return 0
-}
-
 interface Props {
-  invoices: Invoice[]
+  data: RevenueDataPoint[]
   onClientClick: (clientName: string) => void
   selectedClient: string | null
 }
 
-export function RevenueByClientChart({ invoices, onClientClick, selectedClient }: Props) {
-  const accepted = invoices.filter(i => i.status === 'Accepted')
-
-  const byClient = accepted.reduce<Record<string, number>>((acc, inv) => {
-    const pln = toPlnGross(inv)
-    acc[inv.clientName] = (acc[inv.clientName] ?? 0) + pln
+export function RevenueByClientChart({ data, onClientClick, selectedClient }: Props) {
+  const byClient = data.reduce<Record<string, number>>((acc, p) => {
+    acc[p.clientName] = (acc[p.clientName] ?? 0) + p.valuePLN
     return acc
   }, {})
 
-  const data = Object.entries(byClient)
+  const chartData = Object.entries(byClient)
     .map(([name, value]) => ({ name, value: Math.round(value) }))
     .filter(d => d.value > 0)
     .sort((a, b) => b.value - a.value)
 
-  if (data.length === 0) {
+  if (chartData.length === 0) {
     return (
       <div className="bg-white border border-gray-200 rounded-xl p-4">
         <div className="text-sm font-semibold text-gray-700 mb-4">Przychód wg klientów</div>
@@ -49,7 +40,7 @@ export function RevenueByClientChart({ invoices, onClientClick, selectedClient }
       <ResponsiveContainer width="100%" height={260}>
         <PieChart>
           <Pie
-            data={data}
+            data={chartData}
             cx="50%"
             cy="50%"
             innerRadius={60}
@@ -59,7 +50,7 @@ export function RevenueByClientChart({ invoices, onClientClick, selectedClient }
             onClick={(sliceData) => { if (sliceData?.name) onClientClick(sliceData.name as string) }}
             style={{ cursor: 'pointer' }}
           >
-            {data.map((entry, i) => (
+            {chartData.map((entry, i) => (
               <Cell
                 key={i}
                 fill={COLORS[i % COLORS.length]}
