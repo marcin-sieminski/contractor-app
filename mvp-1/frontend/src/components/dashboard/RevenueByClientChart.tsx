@@ -11,9 +11,11 @@ function toPlnGross(inv: Invoice): number {
 
 interface Props {
   invoices: Invoice[]
+  onClientClick: (clientName: string) => void
+  selectedClient: string | null
 }
 
-export function RevenueByClientChart({ invoices }: Props) {
+export function RevenueByClientChart({ invoices, onClientClick, selectedClient }: Props) {
   const accepted = invoices.filter(i => i.status === 'Accepted')
 
   const byClient = accepted.reduce<Record<string, number>>((acc, inv) => {
@@ -40,7 +42,10 @@ export function RevenueByClientChart({ invoices }: Props) {
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-4">
-      <div className="text-sm font-semibold text-gray-700 mb-4">Przychód wg klientów</div>
+      <div className="flex items-center justify-between mb-4">
+        <span className="text-sm font-semibold text-gray-700">Przychód wg klientów</span>
+        <span className="text-xs text-gray-400">kliknij wycinek aby zobaczyć szczegóły</span>
+      </div>
       <ResponsiveContainer width="100%" height={260}>
         <PieChart>
           <Pie
@@ -51,9 +56,17 @@ export function RevenueByClientChart({ invoices }: Props) {
             outerRadius={100}
             paddingAngle={2}
             dataKey="value"
+            onClick={(sliceData) => { if (sliceData?.name) onClientClick(sliceData.name as string) }}
+            style={{ cursor: 'pointer' }}
           >
-            {data.map((_, i) => (
-              <Cell key={i} fill={COLORS[i % COLORS.length]} />
+            {data.map((entry, i) => (
+              <Cell
+                key={i}
+                fill={COLORS[i % COLORS.length]}
+                opacity={selectedClient && selectedClient !== entry.name ? 0.4 : 1}
+                stroke={selectedClient === entry.name ? '#1e293b' : 'none'}
+                strokeWidth={selectedClient === entry.name ? 2 : 0}
+              />
             ))}
           </Pie>
           <Tooltip
@@ -61,7 +74,15 @@ export function RevenueByClientChart({ invoices }: Props) {
             contentStyle={{ fontSize: 12, borderRadius: 8 }}
           />
           <Legend
-            formatter={(value) => <span className="text-xs text-gray-600">{value}</span>}
+            formatter={(value) => (
+              <span
+                className="text-xs cursor-pointer"
+                style={{ color: selectedClient && selectedClient !== value ? '#9ca3af' : '#4b5563' }}
+                onClick={() => onClientClick(value)}
+              >
+                {value}
+              </span>
+            )}
           />
         </PieChart>
       </ResponsiveContainer>

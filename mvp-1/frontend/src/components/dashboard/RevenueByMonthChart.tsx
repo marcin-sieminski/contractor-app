@@ -1,4 +1,4 @@
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell } from 'recharts'
 import { format, subMonths, startOfMonth } from 'date-fns'
 import { pl } from 'date-fns/locale'
 import type { Invoice } from '../../types/invoice'
@@ -11,9 +11,11 @@ function toPlnGross(inv: Invoice): number {
 
 interface Props {
   invoices: Invoice[]
+  onMonthClick: (monthKey: string) => void
+  selectedMonth: string | null
 }
 
-export function RevenueByMonthChart({ invoices }: Props) {
+export function RevenueByMonthChart({ invoices, onMonthClick, selectedMonth }: Props) {
   const accepted = invoices.filter(i => i.status === 'Accepted')
 
   const now = new Date()
@@ -48,9 +50,16 @@ export function RevenueByMonthChart({ invoices }: Props) {
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-4">
-      <div className="text-sm font-semibold text-gray-700 mb-4">Przychód miesięczny (12 mies.)</div>
+      <div className="flex items-center justify-between mb-4">
+        <span className="text-sm font-semibold text-gray-700">Przychód miesięczny (12 mies.)</span>
+        <span className="text-xs text-gray-400">kliknij słupek aby zobaczyć szczegóły</span>
+      </div>
       <ResponsiveContainer width="100%" height={260}>
-        <BarChart data={data} margin={{ top: 4, right: 8, left: 8, bottom: 0 }}>
+        <BarChart
+          data={data}
+          margin={{ top: 4, right: 8, left: 8, bottom: 0 }}
+          style={{ cursor: 'pointer' }}
+        >
           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
           <XAxis
             dataKey="label"
@@ -68,9 +77,21 @@ export function RevenueByMonthChart({ invoices }: Props) {
           <Tooltip
             formatter={(value) => [fmt(Number(value ?? 0)) + ' PLN', 'Przychód']}
             contentStyle={{ fontSize: 12, borderRadius: 8 }}
-            cursor={{ fill: '#f3f4f6' }}
+            cursor={{ fill: '#eff6ff' }}
           />
-          <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]} maxBarSize={48} />
+          <Bar
+            dataKey="value"
+            radius={[4, 4, 0, 0]}
+            maxBarSize={48}
+            onClick={(barData) => { if (barData?.payload?.key) onMonthClick(barData.payload.key as string) }}
+          >
+            {data.map(entry => (
+              <Cell
+                key={entry.key}
+                fill={entry.key === selectedMonth ? '#1d4ed8' : '#3b82f6'}
+              />
+            ))}
+          </Bar>
         </BarChart>
       </ResponsiveContainer>
     </div>

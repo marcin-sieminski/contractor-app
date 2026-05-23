@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { getTimeEntries } from '../api/timeEntries'
 import { getInvoices } from '../api/invoices'
@@ -5,8 +6,12 @@ import { getClients } from '../api/clients'
 import { TimerWidget } from '../components/timer/TimerWidget'
 import { RevenueByClientChart } from '../components/dashboard/RevenueByClientChart'
 import { RevenueByMonthChart } from '../components/dashboard/RevenueByMonthChart'
+import { MonthDetailModal } from '../components/dashboard/MonthDetailModal'
+import { ClientDetailModal } from '../components/dashboard/ClientDetailModal'
 
 export function DashboardPage() {
+  const [selectedMonth, setSelectedMonth] = useState<string | null>(null)
+  const [selectedClient, setSelectedClient] = useState<string | null>(null)
   const { data: entries = [] } = useQuery({ queryKey: ['timeEntries'], queryFn: () => getTimeEntries() })
   const { data: invoices = [] } = useQuery({ queryKey: ['invoices'], queryFn: () => getInvoices() })
   const { data: clients = [] } = useQuery({ queryKey: ['clients'], queryFn: getClients })
@@ -33,6 +38,7 @@ export function DashboardPage() {
   ).length
 
   return (
+    <>
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
 
@@ -66,8 +72,16 @@ export function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-2 gap-4 mb-6">
-        <RevenueByMonthChart invoices={invoices} />
-        <RevenueByClientChart invoices={invoices} />
+        <RevenueByMonthChart
+          invoices={invoices}
+          selectedMonth={selectedMonth}
+          onMonthClick={key => setSelectedMonth(key)}
+        />
+        <RevenueByClientChart
+          invoices={invoices}
+          selectedClient={selectedClient}
+          onClientClick={name => setSelectedClient(name)}
+        />
       </div>
 
       <div className="bg-white border border-gray-200 rounded-xl p-4">
@@ -83,5 +97,21 @@ export function DashboardPage() {
         }
       </div>
     </div>
+
+    {selectedMonth && (
+      <MonthDetailModal
+        monthKey={selectedMonth}
+        entries={entries}
+        onClose={() => setSelectedMonth(null)}
+      />
+    )}
+    {selectedClient && (
+      <ClientDetailModal
+        clientName={selectedClient}
+        entries={entries}
+        onClose={() => setSelectedClient(null)}
+      />
+    )}
+    </>
   )
 }
