@@ -16,5 +16,8 @@ export const stopTimer = (id: string) =>
 export const createManualEntry = (data: { projectId: string; startedAt: string; stoppedAt: string; description: string }) =>
   api.post<TimeEntry>('/time-entries/manual', data).then(r => r.data)
 
+export const updateTimeEntry = (id: string, data: { projectId: string; startedAt: string; stoppedAt: string; description: string }) =>
+  api.put<TimeEntry>(`/time-entries/${id}`, data).then(r => r.data)
+
 export const deleteTimeEntry = (id: string) =>
   api.delete(`/time-entries/${id}`)
