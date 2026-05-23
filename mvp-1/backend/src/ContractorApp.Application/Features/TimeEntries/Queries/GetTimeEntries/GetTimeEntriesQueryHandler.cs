@@ -8,14 +8,19 @@ namespace ContractorApp.Application.Features.TimeEntries.Queries.GetTimeEntries;
 public class GetTimeEntriesQueryHandler : IRequestHandler<GetTimeEntriesQuery, List<TimeEntryDto>>
 {
     private readonly IApplicationDbContext _db;
+    private readonly ICurrentUserService _currentUser;
 
-    public GetTimeEntriesQueryHandler(IApplicationDbContext db) => _db = db;
+    public GetTimeEntriesQueryHandler(IApplicationDbContext db, ICurrentUserService currentUser)
+    {
+        _db = db;
+        _currentUser = currentUser;
+    }
 
     public async Task<List<TimeEntryDto>> Handle(GetTimeEntriesQuery request, CancellationToken cancellationToken)
     {
         var query = _db.TimeEntries
             .Include(t => t.Project).ThenInclude(p => p.Client)
-            .Where(t => t.DeletedAt == null);
+            .Where(t => t.DeletedAt == null && t.Project.Client.UserId == _currentUser.UserId);
 
         if (request.ProjectId.HasValue)
             query = query.Where(t => t.ProjectId == request.ProjectId.Value);

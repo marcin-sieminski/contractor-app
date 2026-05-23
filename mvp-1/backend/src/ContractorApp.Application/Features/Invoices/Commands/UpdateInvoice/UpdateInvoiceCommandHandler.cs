@@ -12,11 +12,13 @@ public class UpdateInvoiceCommandHandler : IRequestHandler<UpdateInvoiceCommand,
 {
     private readonly IApplicationDbContext _db;
     private readonly INbpService _nbp;
+    private readonly ICurrentUserService _currentUser;
 
-    public UpdateInvoiceCommandHandler(IApplicationDbContext db, INbpService nbp)
+    public UpdateInvoiceCommandHandler(IApplicationDbContext db, INbpService nbp, ICurrentUserService currentUser)
     {
         _db = db;
         _nbp = nbp;
+        _currentUser = currentUser;
     }
 
     public async Task<InvoiceDto> Handle(UpdateInvoiceCommand request, CancellationToken cancellationToken)
@@ -24,7 +26,10 @@ public class UpdateInvoiceCommandHandler : IRequestHandler<UpdateInvoiceCommand,
         var invoice = await _db.Invoices
             .Include(i => i.Client)
             .Include(i => i.LineItems)
-            .FirstOrDefaultAsync(i => i.Id == request.InvoiceId, cancellationToken)
+            .FirstOrDefaultAsync(i =>
+                i.Id == request.InvoiceId &&
+                i.Client.UserId == _currentUser.UserId,
+                cancellationToken)
             ?? throw new DomainException($"Faktura {request.InvoiceId} nie istnieje.");
 
         if (invoice.Status != InvoiceStatus.Draft)

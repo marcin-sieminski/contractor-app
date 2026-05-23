@@ -13,6 +13,7 @@ public class Client : Entity
     public string Country { get; set; } = "PL";
     public bool IsVerified { get; set; }
     public bool IsEuVatPayer { get; set; }
+    public string UserId { get; set; } = string.Empty;
     public DateTimeOffset? DeletedAt { get; set; }
 
     public ICollection<Project> Projects { get; set; } = new List<Project>();

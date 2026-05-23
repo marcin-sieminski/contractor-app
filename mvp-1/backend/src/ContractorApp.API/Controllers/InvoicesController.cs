@@ -14,11 +14,13 @@ namespace ContractorApp.API.Controllers;
 public class InvoicesController : BaseApiController
 {
     private readonly IApplicationDbContext _db;
+    private readonly ICurrentUserService _currentUser;
     private readonly KsefOptions _ksefOpts;
 
-    public InvoicesController(IApplicationDbContext db, IOptions<KsefOptions> ksefOpts)
+    public InvoicesController(IApplicationDbContext db, ICurrentUserService currentUser, IOptions<KsefOptions> ksefOpts)
     {
         _db = db;
+        _currentUser = currentUser;
         _ksefOpts = ksefOpts.Value;
     }
 
@@ -36,7 +38,9 @@ public class InvoicesController : BaseApiController
     [HttpGet("{id:guid}/xml")]
     public async Task<IActionResult> GetXml(Guid id, CancellationToken ct)
     {
-        var invoice = await _db.Invoices.FirstOrDefaultAsync(i => i.Id == id, ct);
+        var invoice = await _db.Invoices
+            .Include(i => i.Client)
+            .FirstOrDefaultAsync(i => i.Id == id && i.Client.UserId == _currentUser.UserId, ct);
         if (invoice is null) return NotFound();
         if (string.IsNullOrEmpty(invoice.XmlContent)) return NoContent();
         return Content(invoice.XmlContent, "application/xml");

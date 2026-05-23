@@ -9,8 +9,13 @@ namespace ContractorApp.Application.Features.Clients.Commands.CreateClient;
 public class CreateClientCommandHandler : IRequestHandler<CreateClientCommand, ClientDto>
 {
     private readonly IApplicationDbContext _db;
+    private readonly ICurrentUserService _currentUser;
 
-    public CreateClientCommandHandler(IApplicationDbContext db) => _db = db;
+    public CreateClientCommandHandler(IApplicationDbContext db, ICurrentUserService currentUser)
+    {
+        _db = db;
+        _currentUser = currentUser;
+    }
 
     public async Task<ClientDto> Handle(CreateClientCommand request, CancellationToken cancellationToken)
     {
@@ -26,7 +31,8 @@ public class CreateClientCommandHandler : IRequestHandler<CreateClientCommand, C
             PostalCode = request.PostalCode,
             Country = request.Country,
             IsEuVatPayer = request.IsEuVatPayer,
-            IsVerified = false
+            IsVerified = false,
+            UserId = _currentUser.UserId
         };
 
         _db.Clients.Add(client);

@@ -12,15 +12,18 @@ public class SubmitToKsefCommandHandler : IRequestHandler<SubmitToKsefCommand, I
     private readonly IApplicationDbContext _db;
     private readonly IKsefService _ksef;
     private readonly IKsefXmlBuilder _xmlBuilder;
+    private readonly ICurrentUserService _currentUser;
 
     public SubmitToKsefCommandHandler(
         IApplicationDbContext db,
         IKsefService ksef,
-        IKsefXmlBuilder xmlBuilder)
+        IKsefXmlBuilder xmlBuilder,
+        ICurrentUserService currentUser)
     {
         _db = db;
         _ksef = ksef;
         _xmlBuilder = xmlBuilder;
+        _currentUser = currentUser;
     }
 
     public async Task<InvoiceDto> Handle(SubmitToKsefCommand request, CancellationToken cancellationToken)
@@ -28,7 +31,10 @@ public class SubmitToKsefCommandHandler : IRequestHandler<SubmitToKsefCommand, I
         var invoice = await _db.Invoices
             .Include(i => i.Client)
             .Include(i => i.LineItems)
-            .FirstOrDefaultAsync(i => i.Id == request.InvoiceId, cancellationToken)
+            .FirstOrDefaultAsync(i =>
+                i.Id == request.InvoiceId &&
+                i.Client.UserId == _currentUser.UserId,
+                cancellationToken)
             ?? throw new DomainException($"Faktura {request.InvoiceId} nie istnieje.");
 
         if (invoice.Status == InvoiceStatus.Accepted)

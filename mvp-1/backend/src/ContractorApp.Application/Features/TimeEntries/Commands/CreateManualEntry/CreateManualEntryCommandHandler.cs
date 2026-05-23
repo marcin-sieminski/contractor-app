@@ -10,8 +10,13 @@ namespace ContractorApp.Application.Features.TimeEntries.Commands.CreateManualEn
 public class CreateManualEntryCommandHandler : IRequestHandler<CreateManualEntryCommand, TimeEntryDto>
 {
     private readonly IApplicationDbContext _db;
+    private readonly ICurrentUserService _currentUser;
 
-    public CreateManualEntryCommandHandler(IApplicationDbContext db) => _db = db;
+    public CreateManualEntryCommandHandler(IApplicationDbContext db, ICurrentUserService currentUser)
+    {
+        _db = db;
+        _currentUser = currentUser;
+    }
 
     public async Task<TimeEntryDto> Handle(CreateManualEntryCommand request, CancellationToken cancellationToken)
     {
@@ -20,7 +25,11 @@ public class CreateManualEntryCommandHandler : IRequestHandler<CreateManualEntry
 
         var project = await _db.Projects
             .Include(p => p.Client)
-            .FirstOrDefaultAsync(p => p.Id == request.ProjectId && p.DeletedAt == null, cancellationToken)
+            .FirstOrDefaultAsync(p =>
+                p.Id == request.ProjectId &&
+                p.DeletedAt == null &&
+                p.Client.UserId == _currentUser.UserId,
+                cancellationToken)
             ?? throw new DomainException($"Projekt {request.ProjectId} nie istnieje.");
 
         var entry = new TimeEntry

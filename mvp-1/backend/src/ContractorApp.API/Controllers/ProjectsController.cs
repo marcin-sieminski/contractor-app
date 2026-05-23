@@ -2,7 +2,7 @@ using ContractorApp.Application.Common.Interfaces;
 using ContractorApp.Application.DTOs;
 using ContractorApp.Domain.Entities;
 using ContractorApp.Domain.Enums;
-using MediatR;
+using ContractorApp.Domain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,15 +11,20 @@ namespace ContractorApp.API.Controllers;
 public class ProjectsController : BaseApiController
 {
     private readonly IApplicationDbContext _db;
+    private readonly ICurrentUserService _currentUser;
 
-    public ProjectsController(IApplicationDbContext db) => _db = db;
+    public ProjectsController(IApplicationDbContext db, ICurrentUserService currentUser)
+    {
+        _db = db;
+        _currentUser = currentUser;
+    }
 
     [HttpGet]
     public async Task<IActionResult> GetAll([FromQuery] Guid? clientId, CancellationToken ct)
     {
         var query = _db.Projects
             .Include(p => p.Client)
-            .Where(p => p.DeletedAt == null);
+            .Where(p => p.DeletedAt == null && p.Client.UserId == _currentUser.UserId);
 
         if (clientId.HasValue)
             query = query.Where(p => p.ClientId == clientId.Value);
@@ -35,6 +40,12 @@ public class ProjectsController : BaseApiController
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateProjectRequest req, CancellationToken ct)
     {
+        var clientExists = await _db.Clients.AnyAsync(
+            c => c.Id == req.ClientId && c.DeletedAt == null && c.UserId == _currentUser.UserId, ct);
+
+        if (!clientExists)
+            throw new DomainException($"Klient {req.ClientId} nie istnieje.");
+
         var project = new Project
         {
             ClientId = req.ClientId,

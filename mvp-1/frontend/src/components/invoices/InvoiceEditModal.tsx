@@ -24,13 +24,6 @@ const CURRENCY_OPTIONS = [
   { value: 4, label: 'CHF' }
 ]
 
-const VAT_LABEL: Record<string, string> = {
-  Domestic23: 'Krajowy 23% VAT',
-  ReverseCharge: 'Odwrotne obciążenie (UE)',
-  OutsideEU: 'Poza UE (np.)',
-  Exempt: 'Zwolniony (ZW)'
-}
-
 const VAT_TO_INDEX: Record<string, number> = {
   Domestic23: 0, ReverseCharge: 1, OutsideEU: 2, Exempt: 3
 }

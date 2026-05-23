@@ -10,20 +10,34 @@ namespace ContractorApp.Application.Features.TimeEntries.Commands.StartTimer;
 public class StartTimerCommandHandler : IRequestHandler<StartTimerCommand, TimeEntryDto>
 {
     private readonly IApplicationDbContext _db;
+    private readonly ICurrentUserService _currentUser;
 
-    public StartTimerCommandHandler(IApplicationDbContext db) => _db = db;
+    public StartTimerCommandHandler(IApplicationDbContext db, ICurrentUserService currentUser)
+    {
+        _db = db;
+        _currentUser = currentUser;
+    }
 
     public async Task<TimeEntryDto> Handle(StartTimerCommand request, CancellationToken cancellationToken)
     {
         var activeTimer = await _db.TimeEntries
-            .FirstOrDefaultAsync(t => t.StoppedAt == null && t.DeletedAt == null, cancellationToken);
+            .Include(t => t.Project).ThenInclude(p => p.Client)
+            .FirstOrDefaultAsync(t =>
+                t.StoppedAt == null &&
+                t.DeletedAt == null &&
+                t.Project.Client.UserId == _currentUser.UserId,
+                cancellationToken);
 
         if (activeTimer is not null)
             throw new DomainException("Istnieje już uruchomiony timer. Zatrzymaj go przed rozpoczęciem nowego.");
 
         var project = await _db.Projects
             .Include(p => p.Client)
-            .FirstOrDefaultAsync(p => p.Id == request.ProjectId && p.DeletedAt == null, cancellationToken)
+            .FirstOrDefaultAsync(p =>
+                p.Id == request.ProjectId &&
+                p.DeletedAt == null &&
+                p.Client.UserId == _currentUser.UserId,
+                cancellationToken)
             ?? throw new DomainException($"Projekt {request.ProjectId} nie istnieje.");
 
         var entry = new TimeEntry

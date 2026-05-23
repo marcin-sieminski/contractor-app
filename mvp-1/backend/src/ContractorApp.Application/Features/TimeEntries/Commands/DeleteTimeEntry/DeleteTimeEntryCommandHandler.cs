@@ -8,13 +8,23 @@ namespace ContractorApp.Application.Features.TimeEntries.Commands.DeleteTimeEntr
 public class DeleteTimeEntryCommandHandler : IRequestHandler<DeleteTimeEntryCommand>
 {
     private readonly IApplicationDbContext _db;
+    private readonly ICurrentUserService _currentUser;
 
-    public DeleteTimeEntryCommandHandler(IApplicationDbContext db) => _db = db;
+    public DeleteTimeEntryCommandHandler(IApplicationDbContext db, ICurrentUserService currentUser)
+    {
+        _db = db;
+        _currentUser = currentUser;
+    }
 
     public async Task Handle(DeleteTimeEntryCommand request, CancellationToken cancellationToken)
     {
         var entry = await _db.TimeEntries
-            .FirstOrDefaultAsync(t => t.Id == request.TimeEntryId && t.DeletedAt == null, cancellationToken)
+            .Include(t => t.Project).ThenInclude(p => p.Client)
+            .FirstOrDefaultAsync(t =>
+                t.Id == request.TimeEntryId &&
+                t.DeletedAt == null &&
+                t.Project.Client.UserId == _currentUser.UserId,
+                cancellationToken)
             ?? throw new DomainException($"Wpis czasu {request.TimeEntryId} nie istnieje.");
 
         if (entry.IsInvoiced)

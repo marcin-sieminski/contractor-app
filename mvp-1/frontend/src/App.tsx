@@ -1,19 +1,29 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import { AppShell } from './components/layout/AppShell'
+import { ProtectedRoute } from './components/auth/ProtectedRoute'
 import { DashboardPage } from './pages/DashboardPage'
 import { TimeTrackingPage } from './pages/TimeTrackingPage'
 import { ClientsPage } from './pages/ClientsPage'
 import { InvoicesPage } from './pages/InvoicesPage'
+import { LoginPage } from './pages/LoginPage'
+import { RegisterPage } from './pages/RegisterPage'
 
 export default function App() {
   return (
     <Routes>
-      <Route element={<AppShell />}>
-        <Route index element={<DashboardPage />} />
-        <Route path="time" element={<TimeTrackingPage />} />
-        <Route path="clients" element={<ClientsPage />} />
-        <Route path="invoices" element={<InvoicesPage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+
+      <Route element={<ProtectedRoute />}>
+        <Route element={<AppShell />}>
+          <Route index element={<DashboardPage />} />
+          <Route path="time" element={<TimeTrackingPage />} />
+          <Route path="clients" element={<ClientsPage />} />
+          <Route path="invoices" element={<InvoicesPage />} />
+        </Route>
       </Route>
+
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
 }

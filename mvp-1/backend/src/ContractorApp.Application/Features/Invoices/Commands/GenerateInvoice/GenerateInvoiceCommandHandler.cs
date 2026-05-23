@@ -13,26 +13,36 @@ public class GenerateInvoiceCommandHandler : IRequestHandler<GenerateInvoiceComm
     private readonly IApplicationDbContext _db;
     private readonly INbpService _nbp;
     private readonly IInvoiceNumberService _invoiceNumbers;
+    private readonly ICurrentUserService _currentUser;
 
     public GenerateInvoiceCommandHandler(
         IApplicationDbContext db,
         INbpService nbp,
-        IInvoiceNumberService invoiceNumbers)
+        IInvoiceNumberService invoiceNumbers,
+        ICurrentUserService currentUser)
     {
         _db = db;
         _nbp = nbp;
         _invoiceNumbers = invoiceNumbers;
+        _currentUser = currentUser;
     }
 
     public async Task<InvoiceDto> Handle(GenerateInvoiceCommand request, CancellationToken cancellationToken)
     {
         var client = await _db.Clients
-            .FirstOrDefaultAsync(c => c.Id == request.ClientId && c.DeletedAt == null, cancellationToken)
+            .FirstOrDefaultAsync(c =>
+                c.Id == request.ClientId &&
+                c.DeletedAt == null &&
+                c.UserId == _currentUser.UserId,
+                cancellationToken)
             ?? throw new DomainException($"Klient {request.ClientId} nie istnieje.");
 
         var entries = await _db.TimeEntries
-            .Include(t => t.Project)
-            .Where(t => request.TimeEntryIds.Contains(t.Id) && t.DeletedAt == null)
+            .Include(t => t.Project).ThenInclude(p => p.Client)
+            .Where(t =>
+                request.TimeEntryIds.Contains(t.Id) &&
+                t.DeletedAt == null &&
+                t.Project.Client.UserId == _currentUser.UserId)
             .ToListAsync(cancellationToken);
 
         if (entries.Count != request.TimeEntryIds.Count)

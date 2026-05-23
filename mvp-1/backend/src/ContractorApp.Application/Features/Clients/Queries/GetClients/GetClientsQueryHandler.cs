@@ -8,13 +8,18 @@ namespace ContractorApp.Application.Features.Clients.Queries.GetClients;
 public class GetClientsQueryHandler : IRequestHandler<GetClientsQuery, List<ClientDto>>
 {
     private readonly IApplicationDbContext _db;
+    private readonly ICurrentUserService _currentUser;
 
-    public GetClientsQueryHandler(IApplicationDbContext db) => _db = db;
+    public GetClientsQueryHandler(IApplicationDbContext db, ICurrentUserService currentUser)
+    {
+        _db = db;
+        _currentUser = currentUser;
+    }
 
     public async Task<List<ClientDto>> Handle(GetClientsQuery request, CancellationToken cancellationToken)
     {
         return await _db.Clients
-            .Where(c => c.DeletedAt == null)
+            .Where(c => c.UserId == _currentUser.UserId)
             .Include(c => c.Projects.Where(p => p.DeletedAt == null))
             .OrderBy(c => c.Name)
             .Select(c => c.ToDto())

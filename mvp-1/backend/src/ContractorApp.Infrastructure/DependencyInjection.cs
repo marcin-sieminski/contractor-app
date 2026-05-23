@@ -1,9 +1,12 @@
 using ContractorApp.Application.Common.Interfaces;
+using ContractorApp.Infrastructure.Identity;
 using ContractorApp.Infrastructure.Persistence;
 using ContractorApp.Infrastructure.Services;
+using ContractorApp.Infrastructure.Services.Auth;
 using ContractorApp.Infrastructure.Services.CompanyLookup;
 using ContractorApp.Infrastructure.Services.KSeF;
 using ContractorApp.Infrastructure.Services.Nbp;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,6 +28,22 @@ public static class DependencyInjection
 
         services.AddScoped<IApplicationDbContext>(sp => sp.GetRequiredService<ApplicationDbContext>());
         services.AddScoped<IInvoiceNumberService, InvoiceNumberService>();
+
+        // Identity (user management only, no cookie auth)
+        services.AddIdentityCore<ApplicationUser>(opts =>
+        {
+            opts.Password.RequireDigit = false;
+            opts.Password.RequiredLength = 8;
+            opts.Password.RequireNonAlphanumeric = false;
+            opts.Password.RequireUppercase = false;
+            opts.User.RequireUniqueEmail = true;
+        })
+        .AddEntityFrameworkStores<ApplicationDbContext>()
+        .AddDefaultTokenProviders();
+
+        // Current user service
+        services.AddHttpContextAccessor();
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
 
         // KSeF
         services.Configure<KsefOptions>(configuration.GetSection("KSeF").Bind);
