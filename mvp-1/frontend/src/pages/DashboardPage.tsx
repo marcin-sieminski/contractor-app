@@ -3,6 +3,8 @@ import { getTimeEntries } from '../api/timeEntries'
 import { getInvoices } from '../api/invoices'
 import { getClients } from '../api/clients'
 import { TimerWidget } from '../components/timer/TimerWidget'
+import { RevenueByClientChart } from '../components/dashboard/RevenueByClientChart'
+import { RevenueByMonthChart } from '../components/dashboard/RevenueByMonthChart'
 
 export function DashboardPage() {
   const { data: entries = [] } = useQuery({ queryKey: ['timeEntries'], queryFn: () => getTimeEntries() })
@@ -61,6 +63,11 @@ export function DashboardPage() {
             <div className="text-xs text-gray-400 mt-1">wg kursu NBP z dnia faktury</div>
           )}
         </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4 mb-6">
+        <RevenueByMonthChart invoices={invoices} />
+        <RevenueByClientChart invoices={invoices} />
       </div>
 
       <div className="bg-white border border-gray-200 rounded-xl p-4">
