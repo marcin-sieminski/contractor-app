@@ -3,9 +3,14 @@ import { useQuery } from '@tanstack/react-query'
 import { getTimeEntries } from '../api/timeEntries'
 import { getInvoices } from '../api/invoices'
 import { getClients } from '../api/clients'
+import { getExpenses } from '../api/expenses'
 import { TimerWidget } from '../components/timer/TimerWidget'
 import { RevenueByClientChart } from '../components/dashboard/RevenueByClientChart'
 import { RevenueByMonthChart } from '../components/dashboard/RevenueByMonthChart'
+import { ExpensesByMonthChart } from '../components/dashboard/ExpensesByMonthChart'
+import { ExpensesByCategoryChart } from '../components/dashboard/ExpensesByCategoryChart'
+import { ExpenseMonthDetailModal } from '../components/dashboard/ExpenseMonthDetailModal'
+import { ExpenseCategoryDetailModal } from '../components/dashboard/ExpenseCategoryDetailModal'
 import { MonthDetailModal } from '../components/dashboard/MonthDetailModal'
 import { ClientDetailModal } from '../components/dashboard/ClientDetailModal'
 import type { RevenueDataPoint } from '../types/revenueData'
@@ -16,10 +21,13 @@ export function DashboardPage() {
   const [mode, setMode] = useState<Mode>('invoiced')
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null)
   const [selectedClient, setSelectedClient] = useState<string | null>(null)
+  const [selectedExpenseMonth, setSelectedExpenseMonth] = useState<string | null>(null)
+  const [selectedExpenseCategory, setSelectedExpenseCategory] = useState<string | null>(null)
 
   const { data: entries = [] } = useQuery({ queryKey: ['timeEntries'], queryFn: () => getTimeEntries() })
   const { data: invoices = [] } = useQuery({ queryKey: ['invoices'], queryFn: () => getInvoices() })
   const { data: clients = [] } = useQuery({ queryKey: ['clients'], queryFn: getClients })
+  const { data: expenses = [] } = useQuery({ queryKey: ['expenses'], queryFn: () => getExpenses() })
 
   // ── godziny bieżącego miesiąca ────────────────────────────────────────
   const thisMonthMinutes = entries.filter(e => {
@@ -82,6 +90,7 @@ export function DashboardPage() {
 
   // ── KPIs ─────────────────────────────────────────────────────────────
   const totalRevenuePLN = invoicedPoints.reduce((acc, p) => acc + p.valuePLN, 0)
+  const totalExpensesPLN = expenses.reduce((acc, e) => acc + e.amountPLN, 0)
   const missingRateCount = acceptedInvoices.filter(i => i.currency !== 'PLN' && !i.exchangeRate).length
 
   const uninvoicedMinutes = uninvoicedEntries.reduce((acc, e) => acc + (e.durationMinutes ?? 0), 0)
@@ -101,7 +110,7 @@ export function DashboardPage() {
       </div>
 
       {/* KPI cards */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-5 gap-4 mb-6">
         <div className="bg-white border border-gray-200 rounded-xl p-4">
           <div className="text-gray-500 text-sm mb-1">Godziny (ten miesiąc)</div>
           <div className="text-2xl font-bold text-blue-600">{(thisMonthMinutes / 60).toFixed(1)}h</div>
@@ -139,6 +148,15 @@ export function DashboardPage() {
               {uninvoicedForeignCount} {uninvoicedForeignCount === 1 ? 'wpis' : 'wpisy'} bez kursu pominięte
             </div>
           )}
+        </div>
+        <div className="bg-white border border-gray-200 rounded-xl p-4">
+          <div className="text-gray-500 text-sm mb-1">Łączne wydatki</div>
+          <div className="text-2xl font-bold text-red-600">
+            {totalExpensesPLN > 0
+              ? totalExpensesPLN.toLocaleString('pl-PL', { maximumFractionDigits: 0 }) + ' PLN'
+              : '—'}
+          </div>
+          <div className="text-xs text-gray-400 mt-1">{expenses.length} {expenses.length === 1 ? 'wpis' : 'wpisów'}</div>
         </div>
       </div>
 
@@ -183,6 +201,23 @@ export function DashboardPage() {
         />
       </div>
 
+      {/* Sekcja wydatków */}
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-sm font-semibold text-gray-700">Wydatki</span>
+      </div>
+      <div className="grid grid-cols-2 gap-4 mb-6">
+        <ExpensesByMonthChart
+          data={expenses}
+          selectedMonth={selectedExpenseMonth}
+          onMonthClick={key => setSelectedExpenseMonth(key)}
+        />
+        <ExpensesByCategoryChart
+          data={expenses}
+          selectedCategory={selectedExpenseCategory}
+          onCategoryClick={label => setSelectedExpenseCategory(label)}
+        />
+      </div>
+
       <div className="bg-white border border-gray-200 rounded-xl p-4">
         <div className="text-sm font-semibold text-gray-700 mb-2">Klienci ({clients.length})</div>
         {clients.length === 0
@@ -209,6 +244,20 @@ export function DashboardPage() {
         clientName={selectedClient}
         entries={entries}
         onClose={() => setSelectedClient(null)}
+      />
+    )}
+    {selectedExpenseMonth && (
+      <ExpenseMonthDetailModal
+        monthKey={selectedExpenseMonth}
+        expenses={expenses}
+        onClose={() => setSelectedExpenseMonth(null)}
+      />
+    )}
+    {selectedExpenseCategory && (
+      <ExpenseCategoryDetailModal
+        categoryLabel={selectedExpenseCategory}
+        expenses={expenses}
+        onClose={() => setSelectedExpenseCategory(null)}
       />
     )}
     </>

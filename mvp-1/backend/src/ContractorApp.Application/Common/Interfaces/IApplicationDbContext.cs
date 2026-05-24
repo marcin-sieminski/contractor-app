@@ -11,6 +11,7 @@ public interface IApplicationDbContext
     DbSet<Invoice> Invoices { get; }
     DbSet<InvoiceLineItem> InvoiceLineItems { get; }
     DbSet<ExchangeRate> ExchangeRates { get; }
+    DbSet<Expense> Expenses { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

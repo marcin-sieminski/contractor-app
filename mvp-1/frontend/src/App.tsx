@@ -5,6 +5,7 @@ import { DashboardPage } from './pages/DashboardPage'
 import { TimeTrackingPage } from './pages/TimeTrackingPage'
 import { ClientsPage } from './pages/ClientsPage'
 import { InvoicesPage } from './pages/InvoicesPage'
+import { ExpensesPage } from './pages/ExpensesPage'
 import { LoginPage } from './pages/LoginPage'
 import { RegisterPage } from './pages/RegisterPage'
 
@@ -20,6 +21,7 @@ export default function App() {
           <Route path="time" element={<TimeTrackingPage />} />
           <Route path="clients" element={<ClientsPage />} />
           <Route path="invoices" element={<InvoicesPage />} />
+          <Route path="expenses" element={<ExpensesPage />} />
         </Route>
       </Route>
 
