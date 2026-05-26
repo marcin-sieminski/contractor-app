@@ -1,4 +1,6 @@
 using System.Text;
+using ContractorApp.API.Auth;
+using ContractorApp.API.McpTools;
 using ContractorApp.API.Middleware;
 using ContractorApp.API.Services;
 using ContractorApp.Application;
@@ -34,6 +36,17 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 builder.Services.AddScoped<TokenService>();
 
+builder.Services.AddAuthentication()
+    .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>("ApiKey", _ => { });
+
+builder.Services.AddMcpServer()
+    .WithHttpTransport(options => options.Stateless = true)
+    .WithTools<TimeTools>()
+    .WithTools<InvoiceTools>()
+    .WithTools<ClientTools>()
+    .WithTools<ExpenseTools>()
+    .WithTools<DeadlineTools>();
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -66,4 +79,10 @@ if (app.Environment.IsDevelopment())
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+app.MapMcp("/mcp")
+    .RequireAuthorization(policy => policy
+        .AddAuthenticationSchemes("ApiKey")
+        .RequireAuthenticatedUser());
+
 app.Run();
