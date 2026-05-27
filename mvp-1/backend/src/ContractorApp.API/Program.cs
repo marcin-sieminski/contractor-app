@@ -45,7 +45,8 @@ builder.Services.AddMcpServer()
     .WithTools<InvoiceTools>()
     .WithTools<ClientTools>()
     .WithTools<ExpenseTools>()
-    .WithTools<DeadlineTools>();
+    .WithTools<DeadlineTools>()
+    .WithTools<TaxTools>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
