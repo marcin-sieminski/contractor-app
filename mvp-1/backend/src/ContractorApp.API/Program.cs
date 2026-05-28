@@ -3,11 +3,14 @@ using ContractorApp.API.Auth;
 using ContractorApp.API.McpTools;
 using ContractorApp.API.Middleware;
 using ContractorApp.API.Services;
+using ContractorApp.API.Services.Ai;
 using ContractorApp.Application;
 using ContractorApp.Infrastructure;
 using ContractorApp.Infrastructure.Persistence;
+using ContractorApp.Infrastructure.Services.Ollama;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -47,6 +50,25 @@ builder.Services.AddMcpServer()
     .WithTools<ExpenseTools>()
     .WithTools<DeadlineTools>()
     .WithTools<TaxTools>();
+
+// Lokalny asystent AI (Ollama + reflection-based tool registry)
+builder.Services.Configure<OllamaOptions>(builder.Configuration.GetSection("Ollama"));
+builder.Services.AddHttpClient<OllamaService>((sp, http) =>
+{
+    var opts = sp.GetRequiredService<IOptions<OllamaOptions>>().Value;
+    http.BaseAddress = new Uri(opts.BaseUrl);
+    http.Timeout = TimeSpan.FromSeconds(opts.TimeoutSeconds);
+});
+
+// Klasy narzędzi MCP muszą być w głównym DI, żeby McpToolRegistry mógł je rezolwować w request scope
+builder.Services.AddScoped<TimeTools>();
+builder.Services.AddScoped<InvoiceTools>();
+builder.Services.AddScoped<ClientTools>();
+builder.Services.AddScoped<ExpenseTools>();
+builder.Services.AddScoped<DeadlineTools>();
+builder.Services.AddScoped<TaxTools>();
+
+builder.Services.AddSingleton<McpToolRegistry>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
