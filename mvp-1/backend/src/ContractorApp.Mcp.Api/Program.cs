@@ -1,11 +1,13 @@
 using System.Text;
-using ContractorApp.API.Middleware;
-using ContractorApp.API.Services;
+using ContractorApp.Mcp.Api.Auth;
+using ContractorApp.Mcp.Api.McpTools;
+using ContractorApp.Mcp.Api.Middleware;
+using ContractorApp.Mcp.Api.Services.Ai;
 using ContractorApp.Application;
 using ContractorApp.Infrastructure;
-using ContractorApp.Infrastructure.Persistence;
+using ContractorApp.Infrastructure.Services.Ollama;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,12 +34,40 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 builder.Services.AddAuthorization();
-builder.Services.AddScoped<TokenService>();
+
+builder.Services.AddAuthentication()
+    .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>("ApiKey", _ => { });
+
+builder.Services.AddMcpServer()
+    .WithHttpTransport(options => options.Stateless = true)
+    .WithTools<TimeTools>()
+    .WithTools<InvoiceTools>()
+    .WithTools<ClientTools>()
+    .WithTools<ExpenseTools>()
+    .WithTools<DeadlineTools>()
+    .WithTools<TaxTools>();
+
+builder.Services.Configure<OllamaOptions>(builder.Configuration.GetSection("Ollama"));
+builder.Services.AddHttpClient<OllamaService>((sp, http) =>
+{
+    var opts = sp.GetRequiredService<IOptions<OllamaOptions>>().Value;
+    http.BaseAddress = new Uri(opts.BaseUrl);
+    http.Timeout = TimeSpan.FromSeconds(opts.TimeoutSeconds);
+});
+
+builder.Services.AddScoped<TimeTools>();
+builder.Services.AddScoped<InvoiceTools>();
+builder.Services.AddScoped<ClientTools>();
+builder.Services.AddScoped<ExpenseTools>();
+builder.Services.AddScoped<DeadlineTools>();
+builder.Services.AddScoped<TaxTools>();
+
+builder.Services.AddSingleton<McpToolRegistry>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
-    c.SwaggerDoc("v1", new() { Title = "ContractorApp API", Version = "v1" }));
+    c.SwaggerDoc("v1", new() { Title = "ContractorApp MCP/AI API", Version = "v1" }));
 
 builder.Services.AddCors(opts =>
     opts.AddDefaultPolicy(p => p
@@ -46,12 +76,6 @@ builder.Services.AddCors(opts =>
         .AllowAnyMethod()));
 
 var app = builder.Build();
-
-if (app.Environment.IsDevelopment())
-{
-    using var scope = app.Services.CreateScope();
-    await scope.ServiceProvider.GetRequiredService<ApplicationDbContext>().Database.MigrateAsync();
-}
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseCors();
@@ -65,5 +89,10 @@ if (app.Environment.IsDevelopment())
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+app.MapMcp("/mcp")
+    .RequireAuthorization(policy => policy
+        .AddAuthenticationSchemes("ApiKey")
+        .RequireAuthenticatedUser());
 
 app.Run();

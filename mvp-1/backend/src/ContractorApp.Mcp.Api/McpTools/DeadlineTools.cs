@@ -3,7 +3,7 @@ using ContractorApp.Application.Features.Deadlines.GetUpcomingDeadlines;
 using MediatR;
 using ModelContextProtocol.Server;
 
-namespace ContractorApp.API.McpTools;
+namespace ContractorApp.Mcp.Api.McpTools;
 
 [McpServerToolType]
 public class DeadlineTools(ISender mediator)

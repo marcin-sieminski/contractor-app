@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
-namespace ContractorApp.API.Auth;
+namespace ContractorApp.Mcp.Api.Auth;
 
 public class ApiKeyAuthenticationOptions : AuthenticationSchemeOptions { }
 

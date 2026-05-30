@@ -3,7 +3,7 @@ using ContractorApp.Application.Features.Expenses.Queries.GetExpenses;
 using MediatR;
 using ModelContextProtocol.Server;
 
-namespace ContractorApp.API.McpTools;
+namespace ContractorApp.Mcp.Api.McpTools;
 
 [McpServerToolType]
 public class ExpenseTools(ISender mediator)

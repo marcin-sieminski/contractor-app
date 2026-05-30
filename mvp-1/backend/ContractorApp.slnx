@@ -4,5 +4,6 @@
     <Project Path="src/ContractorApp.Application/ContractorApp.Application.csproj" />
     <Project Path="src/ContractorApp.Domain/ContractorApp.Domain.csproj" />
     <Project Path="src/ContractorApp.Infrastructure/ContractorApp.Infrastructure.csproj" />
+    <Project Path="src/ContractorApp.Mcp.Api/ContractorApp.Mcp.Api.csproj" />
   </Folder>
 </Solution>

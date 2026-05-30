@@ -1,12 +1,12 @@
 using System.Net;
 using System.Text.Json;
-using ContractorApp.API.Services.Ai;
+using ContractorApp.Mcp.Api.Services.Ai;
 using ContractorApp.Infrastructure.Services.Ollama;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 
-namespace ContractorApp.API.Controllers;
+namespace ContractorApp.Mcp.Api.Controllers;
 
 [Authorize]
 [ApiController]

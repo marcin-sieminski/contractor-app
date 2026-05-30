@@ -29,7 +29,7 @@ public class McpController(UserManager<ApplicationUser> userManager) : Controlle
             {
               "mcpServers": {
                 "contractor-app": {
-                  "url": "http://localhost:5000/mcp",
+                  "url": "http://localhost:5040/mcp",
                   "headers": { "Authorization": "ApiKey {{key}}" }
                 }
               }

@@ -3,7 +3,7 @@ using ContractorApp.Application.Features.Invoices.Queries.GetFinancialSummary;
 using MediatR;
 using ModelContextProtocol.Server;
 
-namespace ContractorApp.API.McpTools;
+namespace ContractorApp.Mcp.Api.McpTools;
 
 /// <summary>
 /// MCP #2 — AI Asystent Podatkowy

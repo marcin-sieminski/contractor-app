@@ -4,7 +4,7 @@ using ContractorApp.Application.Features.Invoices.Queries.GetInvoices;
 using MediatR;
 using ModelContextProtocol.Server;
 
-namespace ContractorApp.API.McpTools;
+namespace ContractorApp.Mcp.Api.McpTools;
 
 [McpServerToolType]
 public class InvoiceTools(ISender mediator)

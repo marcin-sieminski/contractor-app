@@ -4,7 +4,7 @@ using ContractorApp.Application.Features.Clients.Queries.LookupCompanyByNip;
 using MediatR;
 using ModelContextProtocol.Server;
 
-namespace ContractorApp.API.McpTools;
+namespace ContractorApp.Mcp.Api.McpTools;
 
 [McpServerToolType]
 public class ClientTools(ISender mediator)

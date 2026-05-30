@@ -7,7 +7,7 @@ using ContractorApp.Application.Features.TimeEntries.Queries.GetTimeEntries;
 using MediatR;
 using ModelContextProtocol.Server;
 
-namespace ContractorApp.API.McpTools;
+namespace ContractorApp.Mcp.Api.McpTools;
 
 [McpServerToolType]
 public class TimeTools(ISender mediator)

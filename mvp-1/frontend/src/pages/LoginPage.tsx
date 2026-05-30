@@ -27,7 +27,7 @@ export function LoginPage() {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 w-full max-w-md p-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">ContractorApp</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">ContractorHub</h1>
         <p className="text-gray-500 mb-8">Zaloguj się do swojego konta</p>
 
         {error && (

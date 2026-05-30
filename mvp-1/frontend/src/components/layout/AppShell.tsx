@@ -18,7 +18,7 @@ export function AppShell() {
   return (
     <div className="flex h-screen">
       <aside className="w-56 bg-white border-r border-gray-200 flex flex-col p-4 gap-1">
-        <div className="font-bold text-xl text-blue-600 mb-6 px-2">ContractorApp</div>
+        <div className="font-bold text-xl text-blue-600 mb-6 px-2">ContractorHub</div>
         {nav.map(({ to, icon: Icon, label }) => (
           <NavLink
             key={to}

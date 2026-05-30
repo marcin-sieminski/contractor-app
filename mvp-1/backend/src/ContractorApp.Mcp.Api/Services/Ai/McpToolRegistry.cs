@@ -5,7 +5,7 @@ using System.Text.Json.Nodes;
 using ContractorApp.Infrastructure.Services.Ollama;
 using ModelContextProtocol.Server;
 
-namespace ContractorApp.API.Services.Ai;
+namespace ContractorApp.Mcp.Api.Services.Ai;
 
 /// <summary>
 /// Skanuje klasy oznaczone [McpServerToolType] w bieżącym assembly i udostępnia je
