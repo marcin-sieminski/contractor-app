@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom'
-import { Clock, Users, FileText, LayoutDashboard, LogOut, Receipt, MessageCircle } from 'lucide-react'
+import { Clock, Users, FileText, LayoutDashboard, LogOut, Receipt, MessageCircle, TrendingUp } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { GlobalTimerBar } from '../timer/GlobalTimerBar'
 
@@ -9,6 +9,7 @@ const nav = [
   { to: '/clients', icon: Users, label: 'Klienci' },
   { to: '/invoices', icon: FileText, label: 'Faktury' },
   { to: '/expenses', icon: Receipt, label: 'Wydatki' },
+  { to: '/forecast', icon: TrendingUp, label: 'Analiza finansowa' },
   { to: '/chat', icon: MessageCircle, label: 'Asystent AI' }
 ]
 

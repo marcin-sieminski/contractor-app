@@ -6,6 +6,7 @@ import { TimeTrackingPage } from './pages/TimeTrackingPage'
 import { ClientsPage } from './pages/ClientsPage'
 import { InvoicesPage } from './pages/InvoicesPage'
 import { ExpensesPage } from './pages/ExpensesPage'
+import { ForecastPage } from './pages/ForecastPage'
 import { ChatPage } from './pages/ChatPage'
 import { LoginPage } from './pages/LoginPage'
 import { RegisterPage } from './pages/RegisterPage'
@@ -23,6 +24,7 @@ export default function App() {
           <Route path="clients" element={<ClientsPage />} />
           <Route path="invoices" element={<InvoicesPage />} />
           <Route path="expenses" element={<ExpensesPage />} />
+          <Route path="forecast" element={<ForecastPage />} />
           <Route path="chat" element={<ChatPage />} />
         </Route>
       </Route>

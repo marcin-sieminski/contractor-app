@@ -1,6 +1,6 @@
 using System.Globalization;
-using ContractorApp.Application.Common;
 using ContractorApp.Application.Common.Interfaces;
+using ContractorApp.Application.Common.Tax;
 using ContractorApp.Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -36,7 +36,7 @@ public class GetFinancialSummaryQueryHandler(
         var totalExpensesPLN = expenses.Sum(e => e.AmountPLN);
 
         var taxBase = Math.Max(0m, totalNetPLN - totalExpensesPLN);
-        var estimatedTax = Math.Round(taxBase * PolishTaxConstants.LinearPitRate, 2);
+        var estimatedTax = Math.Round(taxBase * PolishTaxCalculator.LinearPitRate, 2);
 
         var culture = new CultureInfo("pl-PL");
         var byMonth = Enumerable.Range(1, 12)
@@ -50,6 +50,6 @@ public class GetFinancialSummaryQueryHandler(
 
         return new FinancialSummaryDto(
             year, totalNetPLN, totalGrossPLN,
-            totalExpensesPLN, estimatedTax, PolishTaxConstants.ZusMonthlyEstimate, byMonth);
+            totalExpensesPLN, estimatedTax, PolishTaxCalculator.ZusSocialFull, byMonth);
     }
 }
