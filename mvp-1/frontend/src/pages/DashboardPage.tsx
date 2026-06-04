@@ -103,7 +103,7 @@ export function DashboardPage() {
   return (
     <>
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
+      <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">Dashboard</h1>
 
       <div className="mb-6">
         <TimerWidget />
@@ -111,16 +111,16 @@ export function DashboardPage() {
 
       {/* KPI cards */}
       <div className="grid grid-cols-5 gap-4 mb-6">
-        <div className="bg-white border border-gray-200 rounded-xl p-4">
-          <div className="text-gray-500 text-sm mb-1">Godziny (ten miesiąc)</div>
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
+          <div className="text-gray-500 dark:text-gray-400 text-sm mb-1">Godziny (ten miesiąc)</div>
           <div className="text-2xl font-bold text-blue-600">{(thisMonthMinutes / 60).toFixed(1)}h</div>
         </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-4">
-          <div className="text-gray-500 text-sm mb-1">Faktury do wysłania</div>
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
+          <div className="text-gray-500 dark:text-gray-400 text-sm mb-1">Faktury do wysłania</div>
           <div className="text-2xl font-bold text-orange-500">{pendingInvoices}</div>
         </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-4">
-          <div className="text-gray-500 text-sm mb-1">Łączny przychód (KSeF)</div>
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
+          <div className="text-gray-500 dark:text-gray-400 text-sm mb-1">Łączny przychód (KSeF)</div>
           <div className="text-2xl font-bold text-green-600">
             {totalRevenuePLN.toLocaleString('pl-PL', { maximumFractionDigits: 0 })} PLN
           </div>
@@ -130,17 +130,17 @@ export function DashboardPage() {
             </div>
           )}
           {acceptedInvoices.some(i => i.currency !== 'PLN' && i.exchangeRate) && (
-            <div className="text-xs text-gray-400 mt-1">wg kursu NBP z dnia faktury</div>
+            <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">wg kursu NBP z dnia faktury</div>
           )}
         </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-4">
-          <div className="text-gray-500 text-sm mb-1">Niezafakturowane</div>
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
+          <div className="text-gray-500 dark:text-gray-400 text-sm mb-1">Niezafakturowane</div>
           <div className="text-2xl font-bold text-violet-600">
             {uninvoicedPLN > 0
               ? uninvoicedPLN.toLocaleString('pl-PL', { maximumFractionDigits: 0 }) + ' PLN'
               : '—'}
           </div>
-          <div className="text-xs text-gray-400 mt-1">
+          <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">
             {(uninvoicedMinutes / 60).toFixed(1)}h bez faktury
           </div>
           {uninvoicedForeignCount > 0 && (
@@ -149,27 +149,27 @@ export function DashboardPage() {
             </div>
           )}
         </div>
-        <div className="bg-white border border-gray-200 rounded-xl p-4">
-          <div className="text-gray-500 text-sm mb-1">Łączne wydatki</div>
+        <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
+          <div className="text-gray-500 dark:text-gray-400 text-sm mb-1">Łączne wydatki</div>
           <div className="text-2xl font-bold text-red-600">
             {totalExpensesPLN > 0
               ? totalExpensesPLN.toLocaleString('pl-PL', { maximumFractionDigits: 0 }) + ' PLN'
               : '—'}
           </div>
-          <div className="text-xs text-gray-400 mt-1">{expenses.length} {expenses.length === 1 ? 'wpis' : 'wpisów'}</div>
+          <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">{expenses.length} {expenses.length === 1 ? 'wpis' : 'wpisów'}</div>
         </div>
       </div>
 
       {/* Przełącznik trybu wykresów */}
       <div className="flex items-center justify-between mb-3">
-        <span className="text-sm font-semibold text-gray-700">Przychody</span>
-        <div className="flex rounded-lg border border-gray-200 overflow-hidden text-sm">
+        <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">Przychody</span>
+        <div className="flex rounded-lg border border-gray-200 dark:border-gray-600 overflow-hidden text-sm">
           <button
             onClick={() => setMode('invoiced')}
             className={`px-4 py-1.5 font-medium transition-colors ${
               mode === 'invoiced'
                 ? 'bg-blue-600 text-white'
-                : 'bg-white text-gray-600 hover:bg-gray-50'
+                : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
             }`}
           >
             Zafakturowane
@@ -179,7 +179,7 @@ export function DashboardPage() {
             className={`px-4 py-1.5 font-medium transition-colors border-l border-gray-200 ${
               mode === 'all'
                 ? 'bg-blue-600 text-white'
-                : 'bg-white text-gray-600 hover:bg-gray-50'
+                : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
             }`}
           >
             Wszystkie (+ szacowane)
@@ -203,7 +203,7 @@ export function DashboardPage() {
 
       {/* Sekcja wydatków */}
       <div className="flex items-center justify-between mb-3">
-        <span className="text-sm font-semibold text-gray-700">Wydatki</span>
+        <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">Wydatki</span>
       </div>
       <div className="grid grid-cols-2 gap-4 mb-6">
         <ExpensesByMonthChart
@@ -218,14 +218,14 @@ export function DashboardPage() {
         />
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl p-4">
+      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
         <div className="text-sm font-semibold text-gray-700 mb-2">Klienci ({clients.length})</div>
         {clients.length === 0
           ? <div className="text-gray-400 text-sm">Brak klientów</div>
           : clients.map(c => (
-              <div key={c.id} className="flex justify-between py-1 text-sm border-b border-gray-50 last:border-0">
+              <div key={c.id} className="flex justify-between py-1 text-sm border-b border-gray-50 dark:border-gray-700/50 last:border-0">
                 <span>{c.name}</span>
-                <span className="text-gray-500">{c.projects.length} projektów</span>
+                <span className="text-gray-500 dark:text-gray-400">{c.projects.length} projektów</span>
               </div>
             ))
         }

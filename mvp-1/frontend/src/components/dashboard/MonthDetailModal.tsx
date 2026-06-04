@@ -36,22 +36,22 @@ export function MonthDetailModal({ monthKey, entries, onClose }: Props) {
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[80vh] flex flex-col">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-2xl max-h-[80vh] flex flex-col">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-gray-700">
           <div>
-            <h2 className="text-base font-semibold capitalize">{monthLabel}</h2>
-            <p className="text-xs text-gray-400 mt-0.5">
+            <h2 className="text-base font-semibold capitalize text-gray-900 dark:text-gray-100">{monthLabel}</h2>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
               {monthEntries.length} {monthEntries.length === 1 ? 'wpis' : 'wpisów'} · łącznie {formatDuration(totalMinutes)}
             </p>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 p-1">
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1">
             <X size={18} />
           </button>
         </div>
 
         <div className="overflow-y-auto flex-1 px-5 py-3">
           {monthEntries.length === 0 ? (
-            <div className="text-gray-400 text-sm text-center py-10">
+            <div className="text-gray-400 dark:text-gray-500 text-sm text-center py-10">
               Brak wpisów czasu pracy w tym miesiącu.
             </div>
           ) : (
@@ -60,25 +60,25 @@ export function MonthDetailModal({ monthKey, entries, onClose }: Props) {
               return (
                 <div key={projectKey} className="mb-5">
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                    <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                       {projectKey}
                     </span>
-                    <span className="text-xs font-medium text-gray-500">
+                    <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
                       {formatDuration(projectMinutes)}
                     </span>
                   </div>
-                  <div className="divide-y divide-gray-50 border border-gray-100 rounded-lg overflow-hidden">
+                  <div className="divide-y divide-gray-50 dark:divide-gray-700 border border-gray-100 dark:border-gray-700 rounded-lg overflow-hidden">
                     {projectEntries
                       .sort((a, b) => new Date(a.startedAt).getTime() - new Date(b.startedAt).getTime())
                       .map(entry => (
-                        <div key={entry.id} className="flex items-center gap-3 px-3 py-2.5 bg-white hover:bg-gray-50">
-                          <span className="text-xs text-gray-400 w-16 shrink-0">
+                        <div key={entry.id} className="flex items-center gap-3 px-3 py-2.5 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                          <span className="text-xs text-gray-400 dark:text-gray-500 w-16 shrink-0">
                             {format(new Date(entry.startedAt), 'd MMM', { locale: pl })}
                           </span>
-                          <span className="flex-1 text-sm text-gray-700 truncate">
-                            {entry.description || <span className="text-gray-400 italic">bez opisu</span>}
+                          <span className="flex-1 text-sm text-gray-700 dark:text-gray-200 truncate">
+                            {entry.description || <span className="text-gray-400 dark:text-gray-500 italic">bez opisu</span>}
                           </span>
-                          <span className="font-mono text-sm text-gray-500 shrink-0">
+                          <span className="font-mono text-sm text-gray-500 dark:text-gray-400 shrink-0">
                             {formatDuration(entry.durationMinutes)}
                           </span>
                         </div>

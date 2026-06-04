@@ -25,36 +25,36 @@ export function ManualEntryForm({ onClose }: Props) {
   })
 
   return (
-    <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md">
-        <h2 className="text-lg font-semibold mb-4">Dodaj wpis ręcznie</h2>
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 w-full max-w-md">
+        <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Dodaj wpis ręcznie</h2>
         <div className="space-y-3">
           <select
             value={form.projectId}
             onChange={e => setForm(f => ({ ...f, projectId: e.target.value }))}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+            className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
           >
             <option value="">Projekt...</option>
             {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
           </select>
           <input type="date" value={form.date}
             onChange={e => setForm(f => ({ ...f, date: e.target.value }))}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
+            className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" />
           <div className="flex gap-2">
             <input type="time" value={form.startTime}
               onChange={e => setForm(f => ({ ...f, startTime: e.target.value }))}
-              className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm" />
-            <span className="self-center text-gray-400">—</span>
+              className="flex-1 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" />
+            <span className="self-center text-gray-400 dark:text-gray-500">—</span>
             <input type="time" value={form.endTime}
               onChange={e => setForm(f => ({ ...f, endTime: e.target.value }))}
-              className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm" />
+              className="flex-1 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" />
           </div>
           <input type="text" placeholder="Opis (opcjonalnie)" value={form.description}
             onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
+            className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500" />
         </div>
         <div className="flex gap-2 mt-4 justify-end">
-          <button onClick={onClose} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">Anuluj</button>
+          <button onClick={onClose} className="px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">Anuluj</button>
           <button
             onClick={() => mutation.mutate()}
             disabled={!form.projectId || mutation.isPending}

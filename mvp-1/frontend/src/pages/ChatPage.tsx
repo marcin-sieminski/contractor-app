@@ -123,8 +123,8 @@ export function ChatPage() {
     <div className="p-6 flex flex-col h-[calc(100vh-4rem)]">
       <div className="mb-4 flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Asystent AI</h1>
-          <p className="text-xs text-gray-500 mt-1">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Asystent AI</h1>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
             {selectedProvider === 'claude'
               ? 'Claude API (Anthropic) z dostępem do Twoich danych.'
               : 'Lokalny model (Ollama) z dostępem do Twoich danych.'}
@@ -133,14 +133,14 @@ export function ChatPage() {
 
         {allModels.length > 0 && (
           <div className="flex flex-col items-end gap-2">
-            <div className="flex rounded-lg border border-gray-300 overflow-hidden text-xs font-medium">
+            <div className="flex rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden text-xs font-medium">
               <button
                 onClick={() => switchProvider('ollama')}
                 disabled={mutation.isPending}
                 className={`px-3 py-1.5 transition-colors ${
                   selectedProvider === 'ollama'
                     ? 'bg-blue-600 text-white'
-                    : 'bg-white text-gray-600 hover:bg-gray-50'
+                    : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                 } disabled:opacity-50`}
               >
                 Lokalne (Ollama)
@@ -148,10 +148,10 @@ export function ChatPage() {
               <button
                 onClick={() => switchProvider('claude')}
                 disabled={mutation.isPending}
-                className={`px-3 py-1.5 border-l border-gray-300 transition-colors ${
+                className={`px-3 py-1.5 border-l border-gray-300 dark:border-gray-600 transition-colors ${
                   selectedProvider === 'claude'
                     ? 'bg-blue-600 text-white'
-                    : 'bg-white text-gray-600 hover:bg-gray-50'
+                    : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                 } disabled:opacity-50`}
               >
                 Claude API
@@ -160,13 +160,13 @@ export function ChatPage() {
 
             {providerModels.length > 0 && (
               <div className="flex flex-col items-end gap-1">
-                <label className="text-xs text-gray-500 font-medium">Model</label>
+                <label className="text-xs text-gray-500 dark:text-gray-400 font-medium">Model</label>
                 <div className="relative">
                   <select
                     value={selectedModel}
                     onChange={e => { setSelectedModel(e.target.value); setToolsSupported(true) }}
                     disabled={mutation.isPending}
-                    className="appearance-none bg-white border border-gray-300 rounded-lg pl-3 pr-8 py-2 text-sm font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer disabled:opacity-50"
+                    className="appearance-none bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg pl-3 pr-8 py-2 text-sm font-medium text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer disabled:opacity-50"
                   >
                     {providerModels.map(m => (
                       <option key={m.name} value={m.name}>
@@ -177,7 +177,7 @@ export function ChatPage() {
                   <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
                 </div>
                 {currentModel && currentModel.size > 0 && (
-                  <span className="text-[10px] text-gray-400">{formatSize(currentModel.size)}</span>
+                  <span className="text-[10px] text-gray-400 dark:text-gray-500">{formatSize(currentModel.size)}</span>
                 )}
               </div>
             )}
@@ -186,7 +186,7 @@ export function ChatPage() {
       </div>
 
       {!toolsSupported && selectedProvider === 'ollama' && messages.length > 0 && (
-        <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-800 rounded-lg px-3 py-2 text-xs mb-3">
+        <div className="flex items-center gap-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-400 rounded-lg px-3 py-2 text-xs mb-3">
           <AlertTriangle size={14} className="shrink-0" />
           Ten model nie obsługuje narzędzi — odpowiedzi nie korzystają z Twoich danych (faktur, czasu, finansów).
           Wybierz Qwen2.5 lub przełącz na Claude API.
@@ -195,8 +195,8 @@ export function ChatPage() {
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-3 pr-2">
         {messages.length === 0 && (
-          <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 text-sm text-gray-600">
-            <div className="font-medium text-gray-800 mb-2">Zapytaj asystenta o:</div>
+          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 text-sm text-gray-600 dark:text-gray-300">
+            <div className="font-medium text-gray-800 dark:text-gray-200 mb-2">Zapytaj asystenta o:</div>
             <ul className="space-y-1 list-disc list-inside">
               <li>"Ile zarobiłem w tym roku?"</li>
               <li>"Porównaj formy podatkowe przy 25000 PLN miesięcznie"</li>
@@ -212,21 +212,21 @@ export function ChatPage() {
         ))}
 
         {mutation.isPending && (
-          <div className="mr-auto max-w-[80%] bg-gray-100 rounded-2xl px-4 py-2 flex items-center gap-2 text-sm text-gray-600">
+          <div className="mr-auto max-w-[80%] bg-gray-100 dark:bg-gray-700 rounded-2xl px-4 py-2 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
             <Bot size={16} />
             <span className="inline-flex gap-1">
-              <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-              <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-              <span className="w-1.5 h-1.5 bg-gray-400 rounded-full animate-bounce"></span>
+              <span className="w-1.5 h-1.5 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+              <span className="w-1.5 h-1.5 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+              <span className="w-1.5 h-1.5 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce"></span>
             </span>
             {selectedModel && (
-              <span className="text-[10px] text-gray-400 ml-1">{modelLabel(selectedModel)}</span>
+              <span className="text-[10px] text-gray-400 dark:text-gray-500 ml-1">{modelLabel(selectedModel)}</span>
             )}
           </div>
         )}
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-2 text-sm">
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-xl px-4 py-2 text-sm">
             {error}
           </div>
         )}
@@ -240,7 +240,7 @@ export function ChatPage() {
           rows={2}
           disabled={mutation.isPending}
           placeholder="Wpisz pytanie... (Enter = wyślij, Shift+Enter = nowa linia)"
-          className="flex-1 resize-none border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-1 resize-none border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         {mutation.isPending ? (
           <button
@@ -254,7 +254,7 @@ export function ChatPage() {
           <button
             type="submit"
             disabled={!input.trim()}
-            className="bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed px-4 py-2 rounded-lg font-medium flex items-center gap-2 self-end"
+            className="bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed px-4 py-2 rounded-lg font-medium flex items-center gap-2 self-end"
           >
             <Send size={16} /> Wyślij
           </button>
@@ -301,24 +301,24 @@ function MessageBubble({ message }: { message: ChatMessage }) {
   const hasTools = message.toolCalls && message.toolCalls.length > 0
 
   return (
-    <div className="mr-auto max-w-[80%] bg-gray-100 rounded-2xl px-4 py-2">
-      <div className="flex items-center gap-1 text-xs text-gray-500 mb-1">
+    <div className="mr-auto max-w-[80%] bg-gray-100 dark:bg-gray-700 rounded-2xl px-4 py-2">
+      <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 mb-1">
         <Bot size={12} /> Asystent
       </div>
-      <div className="whitespace-pre-wrap break-words text-gray-900">
-        {message.content || <span className="italic text-gray-500">(brak odpowiedzi)</span>}
+      <div className="whitespace-pre-wrap break-words text-gray-900 dark:text-gray-100">
+        {message.content || <span className="italic text-gray-500 dark:text-gray-400">(brak odpowiedzi)</span>}
       </div>
 
       {hasTools && (
-        <div className="mt-2 pt-2 border-t border-gray-200">
+        <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-600">
           <div className="flex flex-wrap items-center gap-1.5">
-            <span className="text-[11px] text-gray-400 flex items-center gap-1">
+            <span className="text-[11px] text-gray-400 dark:text-gray-500 flex items-center gap-1">
               <Wrench size={11} /> Użyto:
             </span>
             {message.toolCalls!.map((tc, i) => (
               <span
                 key={i}
-                className="inline-flex items-center gap-1 bg-blue-50 text-blue-700 border border-blue-200 rounded-full px-2 py-0.5 text-[11px] font-medium"
+                className="inline-flex items-center gap-1 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800 rounded-full px-2 py-0.5 text-[11px] font-medium"
               >
                 {toolLabel(tc.name)}
               </span>
@@ -326,17 +326,17 @@ function MessageBubble({ message }: { message: ChatMessage }) {
           </div>
 
           <details className="mt-2 text-xs">
-            <summary className="cursor-pointer text-gray-400 hover:text-gray-600 select-none">
+            <summary className="cursor-pointer text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 select-none">
               Szczegóły wywołań
             </summary>
             <div className="mt-2 space-y-2">
               {message.toolCalls!.map((tc, i) => (
-                <div key={i} className="bg-white border border-gray-200 rounded-lg p-2 font-mono">
-                  <div className="font-semibold text-blue-700">{tc.name}</div>
-                  <div className="text-gray-500 mt-1">args:</div>
-                  <pre className="text-[10px] overflow-x-auto">{JSON.stringify(tc.args, null, 2)}</pre>
-                  <div className="text-gray-500 mt-1">result:</div>
-                  <pre className="text-[10px] overflow-x-auto max-h-40">{JSON.stringify(tc.result, null, 2)}</pre>
+                <div key={i} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg p-2 font-mono">
+                  <div className="font-semibold text-blue-700 dark:text-blue-400">{tc.name}</div>
+                  <div className="text-gray-500 dark:text-gray-400 mt-1">args:</div>
+                  <pre className="text-[10px] overflow-x-auto text-gray-700 dark:text-gray-300">{JSON.stringify(tc.args, null, 2)}</pre>
+                  <div className="text-gray-500 dark:text-gray-400 mt-1">result:</div>
+                  <pre className="text-[10px] overflow-x-auto max-h-40 text-gray-700 dark:text-gray-300">{JSON.stringify(tc.result, null, 2)}</pre>
                 </div>
               ))}
             </div>

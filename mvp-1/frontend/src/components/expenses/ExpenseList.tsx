@@ -32,13 +32,13 @@ export function ExpenseList({ expenses }: Props) {
   })
 
   if (expenses.length === 0)
-    return <div className="text-gray-400 text-sm text-center py-10">Brak wydatków. Dodaj pierwszy koszt.</div>
+    return <div className="text-gray-400 dark:text-gray-500 text-sm text-center py-10">Brak wydatków. Dodaj pierwszy koszt.</div>
 
   const grouped = groupByMonth(expenses)
 
   return (
     <>
-      <div className="divide-y divide-gray-100">
+      <div className="divide-y divide-gray-100 dark:divide-gray-700">
         {[...grouped.entries()].map(([monthKey, items]) => {
           const monthTotal = items.reduce((acc, e) => acc + e.amountPLN, 0)
           const [y, m] = monthKey.split('-').map(Number)
@@ -46,40 +46,40 @@ export function ExpenseList({ expenses }: Props) {
 
           return (
             <div key={monthKey}>
-              <div className="px-4 py-2 bg-gray-50 flex justify-between items-center">
-                <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide capitalize">
+              <div className="px-4 py-2 bg-gray-50 dark:bg-gray-900 flex justify-between items-center">
+                <span className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide capitalize">
                   {monthLabel}
                 </span>
-                <span className="text-xs font-semibold text-gray-500">
+                <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">
                   {monthTotal.toLocaleString('pl-PL', { maximumFractionDigits: 2 })} PLN
                 </span>
               </div>
               {items.map(expense => (
-                <div key={expense.id} className="flex items-center px-4 py-3 hover:bg-gray-50 gap-3">
+                <div key={expense.id} className="flex items-center px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 gap-3">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-medium text-sm truncate">{expense.description}</span>
-                      <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full shrink-0">
+                      <span className="font-medium text-sm truncate text-gray-900 dark:text-gray-100">{expense.description}</span>
+                      <span className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-0.5 rounded-full shrink-0">
                         {EXPENSE_CATEGORY_LABELS[expense.category]}
                       </span>
                       {expense.isVatDeductible && (
-                        <span className="text-xs flex items-center gap-1 text-green-600 shrink-0">
+                        <span className="text-xs flex items-center gap-1 text-green-600 dark:text-green-400 shrink-0">
                           <CheckCircle size={11} /> VAT
                         </span>
                       )}
                     </div>
-                    <div className="text-xs text-gray-400 mt-0.5 flex gap-2">
+                    <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 flex gap-2">
                       <span>{format(new Date(expense.date), 'd MMM', { locale: pl })}</span>
                       {expense.receiptNumber && <span>· {expense.receiptNumber}</span>}
                     </div>
                   </div>
 
                   <div className="text-right shrink-0">
-                    <div className="font-mono text-sm font-medium text-gray-800">
+                    <div className="font-mono text-sm font-medium text-gray-800 dark:text-gray-200">
                       {expense.amount.toLocaleString('pl-PL', { maximumFractionDigits: 2 })} {expense.currency}
                     </div>
                     {expense.currency !== 'PLN' && (
-                      <div className="text-xs text-gray-400">
+                      <div className="text-xs text-gray-400 dark:text-gray-500">
                         ≈ {expense.amountPLN.toLocaleString('pl-PL', { maximumFractionDigits: 2 })} PLN
                       </div>
                     )}

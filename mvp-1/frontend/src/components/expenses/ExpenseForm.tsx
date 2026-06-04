@@ -24,6 +24,8 @@ interface FormState {
   receiptNumber: string
 }
 
+const inputCls = "border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+
 export function ExpenseForm({ expense, onClose }: Props) {
   const qc = useQueryClient()
   const isEdit = !!expense
@@ -67,9 +69,9 @@ export function ExpenseForm({ expense, onClose }: Props) {
     (form.currency === 'PLN' || parseFloat(form.exchangeRate) > 0)
 
   return (
-    <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
-        <h2 className="text-lg font-semibold px-6 pt-5 pb-4">
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-md">
+        <h2 className="text-lg font-semibold px-6 pt-5 pb-4 text-gray-900 dark:text-gray-100">
           {isEdit ? 'Edytuj wydatek' : 'Dodaj wydatek'}
         </h2>
 
@@ -79,12 +81,12 @@ export function ExpenseForm({ expense, onClose }: Props) {
               type="date"
               value={form.date}
               onChange={e => set('date', e.target.value)}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className={inputCls}
             />
             <select
               value={form.category}
               onChange={e => set('category', e.target.value as ExpenseCategory)}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className={inputCls}
             >
               {CATEGORIES.map(c => (
                 <option key={c} value={c}>{EXPENSE_CATEGORY_LABELS[c]}</option>
@@ -97,7 +99,7 @@ export function ExpenseForm({ expense, onClose }: Props) {
             placeholder="Opis *"
             value={form.description}
             onChange={e => set('description', e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+            className={'w-full ' + inputCls}
           />
 
           <div className="grid grid-cols-2 gap-3">
@@ -108,12 +110,12 @@ export function ExpenseForm({ expense, onClose }: Props) {
               step="0.01"
               value={form.amount}
               onChange={e => set('amount', e.target.value)}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className={inputCls}
             />
             <select
               value={form.currency}
               onChange={e => set('currency', e.target.value)}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className={inputCls}
             >
               {CURRENCIES.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
@@ -127,7 +129,7 @@ export function ExpenseForm({ expense, onClose }: Props) {
               step="0.0001"
               value={form.exchangeRate}
               onChange={e => set('exchangeRate', e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+              className={'w-full ' + inputCls}
             />
           )}
 
@@ -136,7 +138,7 @@ export function ExpenseForm({ expense, onClose }: Props) {
             placeholder="Nr faktury / paragonu (opcjonalnie)"
             value={form.receiptNumber}
             onChange={e => set('receiptNumber', e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+            className={'w-full ' + inputCls}
           />
 
           <label className="flex items-center gap-2 text-sm cursor-pointer">
@@ -146,16 +148,16 @@ export function ExpenseForm({ expense, onClose }: Props) {
               onChange={e => set('isVatDeductible', e.target.checked)}
               className="rounded"
             />
-            <span className="text-gray-700">Koszt z odliczeniem VAT</span>
+            <span className="text-gray-700 dark:text-gray-200">Koszt z odliczeniem VAT</span>
           </label>
 
           {mutation.isError && (
-            <p className="text-red-600 text-xs">{(mutation.error as Error)?.message ?? 'Błąd zapisu.'}</p>
+            <p className="text-red-600 dark:text-red-400 text-xs">{(mutation.error as Error)?.message ?? 'Błąd zapisu.'}</p>
           )}
         </div>
 
         <div className="flex gap-2 px-6 pb-5 justify-end">
-          <button onClick={onClose} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">
+          <button onClick={onClose} className="px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg">
             Anuluj
           </button>
           <button
