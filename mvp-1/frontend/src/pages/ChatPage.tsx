@@ -2,13 +2,16 @@ import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { Send, Wrench, Bot, User, ChevronDown, AlertTriangle, X } from 'lucide-react'
 import { sendChatMessage, getModels } from '../api/chat'
-import type { ChatMessage } from '../types/chat'
+import type { AiProvider, ChatMessage } from '../types/chat'
 
 function uid() {
   return Math.random().toString(36).slice(2) + Date.now().toString(36)
 }
 
 function modelLabel(name: string): string {
+  if (name === 'claude-haiku-4-5-20251001') return 'Claude Haiku 3.5'
+  if (name === 'claude-sonnet-4-6') return 'Claude Sonnet 4.6'
+  if (name === 'claude-opus-4-8') return 'Claude Opus 4'
   const n = name.toLowerCase()
   if (n.includes('bielik')) return 'Bielik 11B v2.3 (Polski)'
   if (n.includes('qwen2.5') && n.includes('14b')) return 'Qwen2.5 14B'
@@ -25,23 +28,36 @@ export function ChatPage() {
   const [input, setInput] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [selectedModel, setSelectedModel] = useState<string>('')
+  const [selectedProvider, setSelectedProvider] = useState<AiProvider>('ollama')
   const [toolsSupported, setToolsSupported] = useState<boolean>(true)
   const abortRef = useRef<AbortController | null>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
 
   const { data: modelsData } = useQuery({
-    queryKey: ['ollama-models'],
+    queryKey: ['ai-models'],
     queryFn: getModels,
     staleTime: 60_000,
   })
-  const models = modelsData?.models
+  const allModels = modelsData?.models ?? []
   const defaultModel = modelsData?.defaultModel
+  const defaultProvider = modelsData?.defaultProvider ?? 'ollama'
+
+  const providerModels = allModels.filter(m => m.provider === selectedProvider)
 
   useEffect(() => {
-    if (!models || models.length === 0 || selectedModel) return
-    const preferred = defaultModel && models.find(m => m.name === defaultModel)
-    setSelectedModel(preferred ? preferred.name : models[0].name)
-  }, [models, defaultModel, selectedModel])
+    if (allModels.length === 0 || selectedModel) return
+    const preferred = defaultModel && allModels.find(m => m.name === defaultModel && m.provider === defaultProvider)
+    const first = allModels.find(m => m.provider === defaultProvider) ?? allModels[0]
+    setSelectedModel(preferred ? preferred.name : first.name)
+    setSelectedProvider(defaultProvider)
+  }, [allModels, defaultModel, defaultProvider, selectedModel])
+
+  function switchProvider(p: AiProvider) {
+    setSelectedProvider(p)
+    const first = allModels.find(m => m.provider === p)
+    if (first) setSelectedModel(first.name)
+    setToolsSupported(true)
+  }
 
   const mutation = useMutation({
     mutationFn: ({ req, signal }: { req: Parameters<typeof sendChatMessage>[0]; signal: AbortSignal }) =>
@@ -88,6 +104,7 @@ export function ChatPage() {
       req: {
         messages: next.map(m => ({ role: m.role, content: m.content })),
         model: selectedModel || undefined,
+        provider: selectedProvider,
       },
       signal: controller.signal,
     })
@@ -100,7 +117,7 @@ export function ChatPage() {
     }
   }
 
-  const currentModel = models?.find(m => m.name === selectedModel)
+  const currentModel = allModels.find(m => m.name === selectedModel)
 
   return (
     <div className="p-6 flex flex-col h-[calc(100vh-4rem)]">
@@ -108,40 +125,71 @@ export function ChatPage() {
         <div>
           <h1 className="text-2xl font-bold">Asystent AI</h1>
           <p className="text-xs text-gray-500 mt-1">
-            Lokalny model (Ollama) z dostępem do Twoich danych.
+            {selectedProvider === 'claude'
+              ? 'Claude API (Anthropic) z dostępem do Twoich danych.'
+              : 'Lokalny model (Ollama) z dostępem do Twoich danych.'}
           </p>
         </div>
 
-        {models && models.length > 0 && (
-          <div className="flex flex-col items-end gap-1">
-            <label className="text-xs text-gray-500 font-medium">Model</label>
-            <div className="relative">
-              <select
-                value={selectedModel}
-                onChange={e => { setSelectedModel(e.target.value); setToolsSupported(true) }}
+        {allModels.length > 0 && (
+          <div className="flex flex-col items-end gap-2">
+            <div className="flex rounded-lg border border-gray-300 overflow-hidden text-xs font-medium">
+              <button
+                onClick={() => switchProvider('ollama')}
                 disabled={mutation.isPending}
-                className="appearance-none bg-white border border-gray-300 rounded-lg pl-3 pr-8 py-2 text-sm font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer disabled:opacity-50"
+                className={`px-3 py-1.5 transition-colors ${
+                  selectedProvider === 'ollama'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-white text-gray-600 hover:bg-gray-50'
+                } disabled:opacity-50`}
               >
-                {models.map(m => (
-                  <option key={m.name} value={m.name}>
-                    {modelLabel(m.name)}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                Lokalne (Ollama)
+              </button>
+              <button
+                onClick={() => switchProvider('claude')}
+                disabled={mutation.isPending}
+                className={`px-3 py-1.5 border-l border-gray-300 transition-colors ${
+                  selectedProvider === 'claude'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-white text-gray-600 hover:bg-gray-50'
+                } disabled:opacity-50`}
+              >
+                Claude API
+              </button>
             </div>
-            {currentModel && (
-              <span className="text-[10px] text-gray-400">{formatSize(currentModel.size)}</span>
+
+            {providerModels.length > 0 && (
+              <div className="flex flex-col items-end gap-1">
+                <label className="text-xs text-gray-500 font-medium">Model</label>
+                <div className="relative">
+                  <select
+                    value={selectedModel}
+                    onChange={e => { setSelectedModel(e.target.value); setToolsSupported(true) }}
+                    disabled={mutation.isPending}
+                    className="appearance-none bg-white border border-gray-300 rounded-lg pl-3 pr-8 py-2 text-sm font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer disabled:opacity-50"
+                  >
+                    {providerModels.map(m => (
+                      <option key={m.name} value={m.name}>
+                        {modelLabel(m.name)}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                </div>
+                {currentModel && currentModel.size > 0 && (
+                  <span className="text-[10px] text-gray-400">{formatSize(currentModel.size)}</span>
+                )}
+              </div>
             )}
           </div>
         )}
       </div>
 
-      {!toolsSupported && messages.length > 0 && (
+      {!toolsSupported && selectedProvider === 'ollama' && messages.length > 0 && (
         <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 text-amber-800 rounded-lg px-3 py-2 text-xs mb-3">
           <AlertTriangle size={14} className="shrink-0" />
           Ten model nie obsługuje narzędzi — odpowiedzi nie korzystają z Twoich danych (faktur, czasu, finansów).
-          Wybierz Qwen2.5 aby włączyć dostęp do danych.
+          Wybierz Qwen2.5 lub przełącz na Claude API.
         </div>
       )}
 

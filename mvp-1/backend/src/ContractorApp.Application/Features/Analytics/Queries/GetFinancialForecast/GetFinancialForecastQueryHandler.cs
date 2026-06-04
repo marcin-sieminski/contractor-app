@@ -139,6 +139,9 @@ public class GetFinancialForecastQueryHandler(
                 R(totalObligations), R(netCashFlow)));
         }
 
+        if (!(request.IncludeForecast ?? true))
+            months.RemoveAll(m => !m.IsActual);
+
         var ytd = Aggregate(months.Where(x => x.IsActual));
         var fullYear = Aggregate(months);
 

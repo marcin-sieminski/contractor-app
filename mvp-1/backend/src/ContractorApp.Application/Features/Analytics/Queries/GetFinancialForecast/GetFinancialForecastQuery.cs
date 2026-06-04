@@ -10,11 +10,13 @@ namespace ContractorApp.Application.Features.Analytics.Queries.GetFinancialForec
 /// <param name="TaxForm">Forma opodatkowania: ryczalt | liniowy | skala. Domyślnie liniowy.</param>
 /// <param name="ZusStage">Etap ZUS: ulga_na_start | preferencyjny | pelny. Domyślnie pelny.</param>
 /// <param name="VatRate">Stawka VAT do szacunku VAT naliczonego z kosztów. Domyślnie 0,23.</param>
+/// <param name="IncludeForecast">Czy dołączać prognozę run-rate dla miesięcy bez danych. Domyślnie true.</param>
 public record GetFinancialForecastQuery(
     int? Year = null,
     string? TaxForm = null,
     string? ZusStage = null,
-    decimal? VatRate = null) : IRequest<FinancialForecastDto>;
+    decimal? VatRate = null,
+    bool? IncludeForecast = null) : IRequest<FinancialForecastDto>;
 
 public record FinancialForecastDto(
     int Year,

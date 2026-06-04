@@ -15,6 +15,7 @@ public class AnalyticsController : BaseApiController
         [FromQuery] string? taxForm,
         [FromQuery] string? zusStage,
         [FromQuery] decimal? vatRate,
+        [FromQuery] bool? includeForecast,
         CancellationToken ct)
-        => Ok(await Mediator.Send(new GetFinancialForecastQuery(year, taxForm, zusStage, vatRate), ct));
+        => Ok(await Mediator.Send(new GetFinancialForecastQuery(year, taxForm, zusStage, vatRate, includeForecast), ct));
 }

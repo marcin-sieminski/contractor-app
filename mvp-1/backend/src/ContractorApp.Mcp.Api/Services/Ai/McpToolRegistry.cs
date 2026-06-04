@@ -17,6 +17,7 @@ public class McpToolRegistry
     private readonly List<ToolDescriptor> _tools;
     private readonly Dictionary<string, ToolDescriptor> _byName;
     private readonly List<OllamaTool> _ollamaTools;
+    private readonly List<ProviderTool> _providerTools;
     private readonly ILogger<McpToolRegistry> _log;
 
     public McpToolRegistry(ILogger<McpToolRegistry> log)
@@ -25,12 +26,17 @@ public class McpToolRegistry
         _tools = DiscoverTools();
         _byName = _tools.ToDictionary(t => t.Name, StringComparer.Ordinal);
         _ollamaTools = _tools.Select(BuildOllamaTool).ToList();
+        _providerTools = _tools.Select(d => new ProviderTool(d.Name, d.Description, BuildParameterSchema(d))).ToList();
 
         _log.LogInformation("McpToolRegistry: discovered {Count} tools: {Names}",
             _tools.Count, string.Join(", ", _tools.Select(t => t.Name)));
     }
 
     public IReadOnlyList<OllamaTool> GetOllamaTools() => _ollamaTools;
+
+    public IReadOnlyList<ProviderTool> GetProviderTools() => _providerTools;
+
+    public record ProviderTool(string Name, string Description, JsonObject Schema);
 
     public async Task<string> InvokeAsync(
         string toolName,
@@ -112,7 +118,7 @@ public class McpToolRegistry
 
     // ── JSON schema generation (OpenAI tools format) ────────────────────────────
 
-    private static OllamaTool BuildOllamaTool(ToolDescriptor d)
+    private static JsonObject BuildParameterSchema(ToolDescriptor d)
     {
         var properties = new JsonObject();
         var required = new JsonArray();
@@ -120,21 +126,21 @@ public class McpToolRegistry
         foreach (var p in d.Method.GetParameters())
         {
             if (p.ParameterType == typeof(CancellationToken)) continue;
-
-            var prop = BuildPropertySchema(p);
-            properties[p.Name!] = prop;
-
-            if (IsRequired(p))
-                required.Add(p.Name!);
+            properties[p.Name!] = BuildPropertySchema(p);
+            if (IsRequired(p)) required.Add(p.Name!);
         }
 
-        var schema = new JsonObject
+        return new JsonObject
         {
             ["type"] = "object",
             ["properties"] = properties,
             ["required"] = required
         };
+    }
 
+    private static OllamaTool BuildOllamaTool(ToolDescriptor d)
+    {
+        var schema = BuildParameterSchema(d);
         return new OllamaTool
         {
             Type = "function",

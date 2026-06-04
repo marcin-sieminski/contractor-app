@@ -3,6 +3,7 @@ using ContractorApp.Mcp.Api.Auth;
 using ContractorApp.Mcp.Api.McpTools;
 using ContractorApp.Mcp.Api.Middleware;
 using ContractorApp.Mcp.Api.Services.Ai;
+using ContractorApp.Mcp.Api.Services.Claude;
 using ContractorApp.Application;
 using ContractorApp.Infrastructure;
 using ContractorApp.Infrastructure.Services.Ollama;
@@ -63,6 +64,10 @@ builder.Services.AddScoped<DeadlineTools>();
 builder.Services.AddScoped<TaxTools>();
 
 builder.Services.AddSingleton<McpToolRegistry>();
+
+builder.Services.Configure<ClaudeOptions>(builder.Configuration.GetSection("Claude"));
+builder.Services.AddSingleton<ClaudeService>();
+builder.Services.AddScoped<OllamaAiProvider>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

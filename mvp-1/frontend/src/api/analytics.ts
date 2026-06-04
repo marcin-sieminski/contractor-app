@@ -6,4 +6,5 @@ export const getFinancialForecast = (params?: {
   taxForm?: TaxFormKey
   zusStage?: ZusStageKey
   vatRate?: number
+  includeForecast?: boolean
 }) => api.get<FinancialForecast>('/analytics/forecast', { params }).then(r => r.data)

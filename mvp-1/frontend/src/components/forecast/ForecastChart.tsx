@@ -6,11 +6,12 @@ import type { MonthForecast } from '../../types/forecast'
 
 interface Props {
   months: MonthForecast[]
+  showForecastHint?: boolean
 }
 
 const fmt = (v: number) => v.toLocaleString('pl-PL', { maximumFractionDigits: 0 })
 
-export function ForecastChart({ months }: Props) {
+export function ForecastChart({ months, showForecastHint = true }: Props) {
   const data = months.map(m => ({
     label: m.monthName.slice(0, 3),
     isActual: m.isActual,
@@ -29,9 +30,11 @@ export function ForecastChart({ months }: Props) {
     <div className="bg-white border border-gray-200 rounded-xl p-4">
       <div className="flex items-center justify-between mb-4">
         <span className="text-sm font-semibold text-gray-700">
-          Przychód, obciążenia i przepływ netto (12 mies.)
+          Przychód, obciążenia i przepływ netto
         </span>
-        <span className="text-xs text-gray-400">jaśniejszy obszar = prognoza</span>
+        {showForecastHint && (
+          <span className="text-xs text-gray-400">jaśniejszy obszar = prognoza</span>
+        )}
       </div>
       <ResponsiveContainer width="100%" height={320}>
         <ComposedChart data={data} margin={{ top: 4, right: 8, left: 8, bottom: 0 }}>

@@ -1,4 +1,5 @@
 export type ChatRole = 'user' | 'assistant'
+export type AiProvider = 'ollama' | 'claude'
 
 export interface ToolCallSummary {
   name: string
@@ -16,6 +17,7 @@ export interface ChatMessage {
 export interface ChatRequest {
   messages: { role: ChatRole; content: string }[]
   model?: string
+  provider?: AiProvider
 }
 
 export interface ChatResponse {
@@ -25,7 +27,10 @@ export interface ChatResponse {
   toolsSupported: boolean
 }
 
-export interface OllamaModel {
+export interface AiModel {
   name: string
   size: number
+  provider: AiProvider
 }
+
+export type OllamaModel = AiModel
