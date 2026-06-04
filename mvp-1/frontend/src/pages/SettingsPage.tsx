@@ -1,5 +1,8 @@
+import { useState } from 'react'
 import { Monitor, Moon, Sun, Contrast } from 'lucide-react'
 import { useTheme, type Theme } from '../context/ThemeContext'
+import { useAuth } from '../context/AuthContext'
+import { profileApi } from '../api/profile'
 
 interface ThemeOption {
   value: Theme
@@ -17,10 +20,63 @@ const THEME_OPTIONS: ThemeOption[] = [
 
 export function SettingsPage() {
   const { theme, setTheme } = useTheme()
+  const { user, updateDisplayName } = useAuth()
+
+  const [displayName, setDisplayName] = useState(user?.displayName ?? '')
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  async function handleSaveProfile(e: React.FormEvent) {
+    e.preventDefault()
+    setSaving(true)
+    setError(null)
+    try {
+      const result = await profileApi.updateProfile(displayName.trim() || null)
+      updateDisplayName(result.displayName)
+      setSaved(true)
+      setTimeout(() => setSaved(false), 2000)
+    } catch {
+      setError('Nie udało się zapisać zmian.')
+    } finally {
+      setSaving(false)
+    }
+  }
 
   return (
     <div className="p-6 max-w-2xl">
       <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">Ustawienia</h1>
+
+      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 mb-6">
+        <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">Profil</h2>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">Nazwa wyświetlana w pasku nawigacji zamiast adresu e-mail</p>
+        <form onSubmit={handleSaveProfile} className="space-y-4">
+          <div>
+            <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
+              Nazwa użytkownika
+            </label>
+            <input
+              type="text"
+              value={displayName}
+              onChange={e => setDisplayName(e.target.value)}
+              placeholder={user?.email ?? ''}
+              maxLength={80}
+              className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
+              Zostaw puste, aby wyświetlać adres e-mail
+            </p>
+          </div>
+          {error && <p className="text-xs text-red-500">{error}</p>}
+          <button
+            type="submit"
+            disabled={saving}
+            className="px-4 py-2 text-sm font-medium rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white transition-colors"
+          >
+            {saving ? 'Zapisywanie…' : saved ? 'Zapisano ✓' : 'Zapisz'}
+          </button>
+        </form>
+      </div>
 
       <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6">
         <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">Schemat kolorów</h2>

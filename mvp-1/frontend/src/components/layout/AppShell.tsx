@@ -52,7 +52,7 @@ export function AppShell() {
             <Settings size={18} />
             Ustawienia
           </NavLink>
-          <div className="px-2 mb-2 text-xs text-gray-400 dark:text-gray-500 truncate">{user?.email}</div>
+          <div className="px-2 mb-2 text-xs text-gray-400 dark:text-gray-500 truncate">{user?.displayName || user?.email}</div>
           <button
             onClick={logout}
             className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 w-full transition-colors"

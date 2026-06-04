@@ -5,4 +5,5 @@ namespace ContractorApp.Infrastructure.Identity;
 public class ApplicationUser : IdentityUser
 {
     public string? McpApiKey { get; set; }
+    public string? DisplayName { get; set; }
 }
