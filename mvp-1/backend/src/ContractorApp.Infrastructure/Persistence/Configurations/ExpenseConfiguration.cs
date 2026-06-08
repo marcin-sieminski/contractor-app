@@ -14,6 +14,10 @@ public class ExpenseConfiguration : IEntityTypeConfiguration<Expense>
         builder.Property(e => e.AmountPLN).HasPrecision(18, 2);
         builder.Property(e => e.ExchangeRate).HasPrecision(10, 6);
         builder.Property(e => e.ReceiptNumber).HasMaxLength(100);
+        builder.Property(e => e.VendorName).HasMaxLength(200);
+        builder.Property(e => e.VendorNip).HasMaxLength(15);
+        builder.Property(e => e.NetAmount).HasPrecision(18, 2);
+        builder.Property(e => e.VatAmount).HasPrecision(18, 2);
         builder.Property(e => e.UserId).IsRequired();
         builder.HasQueryFilter(e => e.DeletedAt == null);
         builder.HasIndex(e => e.UserId);

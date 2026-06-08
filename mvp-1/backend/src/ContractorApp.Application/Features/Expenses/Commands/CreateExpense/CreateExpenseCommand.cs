@@ -11,4 +11,9 @@ public record CreateExpenseCommand(
     string Currency,
     decimal? ExchangeRate,
     bool IsVatDeductible,
-    string? ReceiptNumber) : IRequest<ExpenseDto>;
+    string? ReceiptNumber,
+    string? VendorName = null,
+    string? VendorNip = null,
+    decimal? NetAmount = null,
+    decimal? VatAmount = null,
+    Guid? ReceiptId = null) : IRequest<ExpenseDto>;

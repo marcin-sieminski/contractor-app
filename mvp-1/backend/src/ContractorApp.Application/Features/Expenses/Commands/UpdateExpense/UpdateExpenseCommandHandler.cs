@@ -42,7 +42,23 @@ public class UpdateExpenseCommandHandler : IRequestHandler<UpdateExpenseCommand,
         expense.AmountPLN = currency == Currency.PLN ? request.Amount : request.Amount * request.ExchangeRate!.Value;
         expense.IsVatDeductible = request.IsVatDeductible;
         expense.ReceiptNumber = request.ReceiptNumber;
+        expense.VendorName = request.VendorName;
+        expense.VendorNip = request.VendorNip;
+        expense.NetAmount = request.NetAmount;
+        expense.VatAmount = request.VatAmount;
         expense.UpdatedAt = DateTimeOffset.UtcNow;
+
+        // Powiąż nowo wgrany skan (np. zeskanowany podczas edycji), jeśli wydatek nie ma jeszcze załącznika.
+        if (request.ReceiptId is Guid receiptId && expense.ReceiptId != receiptId)
+        {
+            var receipt = await _db.ExpenseReceipts.FirstOrDefaultAsync(
+                r => r.Id == receiptId && r.UserId == _currentUser.UserId && r.ExpenseId == null,
+                cancellationToken)
+                ?? throw new DomainException("Skan paragonu nie istnieje lub jest już powiązany z innym wydatkiem.");
+
+            receipt.ExpenseId = expense.Id;
+            expense.ReceiptId = receipt.Id;
+        }
 
         await _db.SaveChangesAsync(cancellationToken);
         return expense.ToDto();

@@ -11,4 +11,10 @@ public record ExpenseDto(
     decimal AmountPLN,
     bool IsVatDeductible,
     string? ReceiptNumber,
+    string? VendorName,
+    string? VendorNip,
+    decimal? NetAmount,
+    decimal? VatAmount,
+    Guid? ReceiptId,
+    bool HasReceipt,
     DateTimeOffset CreatedAt);

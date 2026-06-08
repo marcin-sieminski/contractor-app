@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Pencil, Trash2, CheckCircle } from 'lucide-react'
+import { Pencil, Trash2, CheckCircle, Paperclip } from 'lucide-react'
 import { deleteExpense } from '../../api/expenses'
 import { ExpenseForm } from './ExpenseForm'
+import { ReceiptPreview } from './ReceiptPreview'
 import { EXPENSE_CATEGORY_LABELS } from '../../types/expense'
 import type { Expense } from '../../types/expense'
 import { format } from 'date-fns'
@@ -25,6 +26,7 @@ function groupByMonth(expenses: Expense[]) {
 export function ExpenseList({ expenses }: Props) {
   const qc = useQueryClient()
   const [editing, setEditing] = useState<Expense | null>(null)
+  const [previewing, setPreviewing] = useState<Expense | null>(null)
 
   const deleteMutation = useMutation({
     mutationFn: deleteExpense,
@@ -86,6 +88,15 @@ export function ExpenseList({ expenses }: Props) {
                   </div>
 
                   <div className="flex items-center gap-1 shrink-0">
+                    {expense.hasReceipt && (
+                      <button
+                        onClick={() => setPreviewing(expense)}
+                        className="text-gray-400 hover:text-blue-500 p-1"
+                        title="Podgląd skanu"
+                      >
+                        <Paperclip size={14} />
+                      </button>
+                    )}
                     <button
                       onClick={() => setEditing(expense)}
                       className="text-gray-400 hover:text-blue-500 p-1"
@@ -109,6 +120,7 @@ export function ExpenseList({ expenses }: Props) {
       </div>
 
       {editing && <ExpenseForm expense={editing} onClose={() => setEditing(null)} />}
+      {previewing && <ReceiptPreview expense={previewing} onClose={() => setPreviewing(null)} />}
     </>
   )
 }

@@ -22,7 +22,10 @@ public static class MappingExtensions
     public static ExpenseDto ToDto(this Expense e) => new(
         e.Id, e.Date, e.Category.ToString(), e.Description,
         e.Amount, e.Currency.ToString(), e.ExchangeRate, e.AmountPLN,
-        e.IsVatDeductible, e.ReceiptNumber, e.CreatedAt);
+        e.IsVatDeductible, e.ReceiptNumber,
+        e.VendorName, e.VendorNip, e.NetAmount, e.VatAmount,
+        e.ReceiptId, e.ReceiptId != null,
+        e.CreatedAt);
 
     public static InvoiceDto ToDto(this Invoice i) => new(
         i.Id, i.InvoiceNumber,

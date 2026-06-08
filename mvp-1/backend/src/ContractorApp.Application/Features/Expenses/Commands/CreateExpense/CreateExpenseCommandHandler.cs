@@ -4,6 +4,7 @@ using ContractorApp.Domain.Entities;
 using ContractorApp.Domain.Enums;
 using ContractorApp.Domain.Exceptions;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace ContractorApp.Application.Features.Expenses.Commands.CreateExpense;
 
@@ -45,7 +46,22 @@ public class CreateExpenseCommandHandler : IRequestHandler<CreateExpenseCommand,
             AmountPLN = amountPLN,
             IsVatDeductible = request.IsVatDeductible,
             ReceiptNumber = request.ReceiptNumber,
+            VendorName = request.VendorName,
+            VendorNip = request.VendorNip,
+            NetAmount = request.NetAmount,
+            VatAmount = request.VatAmount,
         };
+
+        if (request.ReceiptId is Guid receiptId)
+        {
+            var receipt = await _db.ExpenseReceipts.FirstOrDefaultAsync(
+                r => r.Id == receiptId && r.UserId == _currentUser.UserId && r.ExpenseId == null,
+                cancellationToken)
+                ?? throw new DomainException("Skan paragonu nie istnieje lub jest już powiązany z innym wydatkiem.");
+
+            receipt.ExpenseId = expense.Id;
+            expense.ReceiptId = receipt.Id;
+        }
 
         _db.Expenses.Add(expense);
         await _db.SaveChangesAsync(cancellationToken);

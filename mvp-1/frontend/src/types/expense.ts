@@ -1,7 +1,7 @@
 export type ExpenseCategory =
   | 'Software' | 'Hardware' | 'Office' | 'Training'
   | 'Travel' | 'Phone' | 'Insurance' | 'Accounting'
-  | 'Marketing' | 'Other'
+  | 'Marketing' | 'Other' | 'Literature'
 
 export const EXPENSE_CATEGORY_LABELS: Record<ExpenseCategory, string> = {
   Software:   'Oprogramowanie',
@@ -14,6 +14,7 @@ export const EXPENSE_CATEGORY_LABELS: Record<ExpenseCategory, string> = {
   Accounting: 'Księgowość',
   Marketing:  'Marketing',
   Other:      'Inne',
+  Literature: 'Literatura',
 }
 
 export interface Expense {
@@ -27,5 +28,33 @@ export interface Expense {
   amountPLN: number
   isVatDeductible: boolean
   receiptNumber?: string
+  vendorName?: string
+  vendorNip?: string
+  netAmount?: number
+  vatAmount?: number
+  receiptId?: string
+  hasReceipt: boolean
   createdAt: string
+}
+
+export type OcrProvider = 'claude' | 'ollama'
+
+/** Dane rozpoznane ze skanu paragonu/faktury (wszystkie pola opcjonalne). */
+export interface ReceiptExtraction {
+  date?: string
+  vendorName?: string
+  vendorNip?: string
+  grossAmount?: number
+  netAmount?: number
+  vatAmount?: number
+  currency?: string
+  receiptNumber?: string
+  isVatDeductible?: boolean
+  category?: ExpenseCategory
+  categoryConfidence?: number
+}
+
+export interface ScanReceiptResult {
+  receiptId: string
+  extracted: ReceiptExtraction
 }

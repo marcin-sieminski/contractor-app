@@ -6,10 +6,12 @@ using ContractorApp.Infrastructure.Services.Auth;
 using ContractorApp.Infrastructure.Services.CompanyLookup;
 using ContractorApp.Infrastructure.Services.KSeF;
 using ContractorApp.Infrastructure.Services.Nbp;
+using ContractorApp.Infrastructure.Services.Ocr;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace ContractorApp.Infrastructure;
 
@@ -60,6 +62,14 @@ public static class DependencyInjection
         // Company Lookup
         services.AddHttpClient<CompanyLookupService>();
         services.AddScoped<ICompanyLookupService, CompanyLookupService>();
+
+        // OCR paragonów/faktur (Claude Vision + fallback Ollama)
+        services.Configure<ReceiptOcrOptions>(configuration.GetSection("ReceiptOcr").Bind);
+        services.AddHttpClient<IReceiptExtractionService, ReceiptExtractionService>((sp, client) =>
+        {
+            var opts = sp.GetRequiredService<IOptions<ReceiptOcrOptions>>().Value;
+            client.Timeout = TimeSpan.FromSeconds(opts.TimeoutSeconds);
+        });
 
         return services;
     }

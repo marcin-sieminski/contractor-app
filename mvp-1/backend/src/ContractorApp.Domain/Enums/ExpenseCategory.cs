@@ -11,5 +11,6 @@ public enum ExpenseCategory
     Insurance = 6,
     Accounting = 7,
     Marketing = 8,
-    Other = 9
+    Other = 9,
+    Literature = 10
 }

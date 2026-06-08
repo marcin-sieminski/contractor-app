@@ -12,6 +12,7 @@ public interface IApplicationDbContext
     DbSet<InvoiceLineItem> InvoiceLineItems { get; }
     DbSet<ExchangeRate> ExchangeRates { get; }
     DbSet<Expense> Expenses { get; }
+    DbSet<ExpenseReceipt> ExpenseReceipts { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

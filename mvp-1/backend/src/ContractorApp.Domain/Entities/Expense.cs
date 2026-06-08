@@ -15,5 +15,15 @@ public class Expense : Entity
     public decimal AmountPLN { get; set; }
     public bool IsVatDeductible { get; set; }
     public string? ReceiptNumber { get; set; }
+
+    // Dane sprzedawcy + rozbicie VAT (wypełniane automatycznie z OCR lub ręcznie)
+    public string? VendorName { get; set; }
+    public string? VendorNip { get; set; }
+    public decimal? NetAmount { get; set; }
+    public decimal? VatAmount { get; set; }
+
+    /// <summary>Powiązany skan paragonu/faktury (<see cref="ExpenseReceipt"/>), jeśli wgrany.</summary>
+    public Guid? ReceiptId { get; set; }
+
     public DateTimeOffset? DeletedAt { get; set; }
 }
