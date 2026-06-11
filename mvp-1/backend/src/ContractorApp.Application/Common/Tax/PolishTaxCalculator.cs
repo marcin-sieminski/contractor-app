@@ -88,4 +88,33 @@ public static class PolishTaxCalculator
     /// <summary>VAT naliczony zawarty w kwocie brutto (np. z kosztów z prawem do odliczenia).</summary>
     public static decimal InputVatFromGross(decimal grossAmount, decimal vatRate) =>
         vatRate <= 0m ? 0m : grossAmount * vatRate / (1m + vatRate);
+
+    /// <summary>
+    /// Roczny PIT formy bazowej (liniowy/skala) od dochodu pomniejszonego o ZUS społeczny.
+    /// Dla skali uwzględnia kwotę wolną i próg 32%.
+    /// </summary>
+    public static decimal BaseAnnualPit(TaxForm form, decimal annualIncome, decimal annualZusSocial)
+    {
+        var baseAfterZus = Math.Max(0m, annualIncome - annualZusSocial);
+        return form == TaxForm.Skala
+            ? ScaleAnnualPit(Math.Max(0m, baseAfterZus - TaxFreeAmount))
+            : baseAfterZus * LinearPitRate; // liniowy 19%
+    }
+
+    /// <summary>
+    /// Roczny PIT z ulgą IP Box: 5% na dochód kwalifikowany (udział = współczynnik Nexus),
+    /// forma bazowa (liniowy 19% lub skala) na pozostałą część dochodu.
+    /// </summary>
+    public static decimal IpBoxAnnualPit(
+        TaxForm form, decimal annualIncome, decimal annualZusSocial, decimal qualifyingShare)
+    {
+        var q = Math.Clamp(qualifyingShare, 0m, 1m);
+        var baseAfterZus = Math.Max(0m, annualIncome - annualZusSocial);
+        var ipBase = baseAfterZus * q;
+        var nonIpBase = baseAfterZus * (1m - q);
+        var nonIpPit = form == TaxForm.Skala
+            ? ScaleAnnualPit(Math.Max(0m, nonIpBase - TaxFreeAmount))
+            : nonIpBase * LinearPitRate;
+        return ipBase * IpBoxRate + nonIpPit;
+    }
 }

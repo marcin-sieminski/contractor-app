@@ -42,6 +42,22 @@ export interface ForecastTotals {
   netCashFlow: number
 }
 
+export interface IpBoxScenario {
+  qualifyingPercent: number
+  nexusCoefficient: number
+  annualPitWithout: number
+  annualPitWith: number
+  annualSavings: number
+  monthlySavings: number
+  totalObligationsWithout: number
+  totalObligationsWith: number
+  netCashFlowWith: number
+  effectiveRateWithout: number
+  effectiveRateWith: number
+  verdict: string
+  conditions: string[]
+}
+
 export interface FinancialForecast {
   year: number
   taxForm: string
@@ -53,4 +69,5 @@ export interface FinancialForecast {
   fullYear: ForecastTotals
   months: MonthForecast[]
   assumptions: string[]
+  ipBox?: IpBoxScenario | null
 }

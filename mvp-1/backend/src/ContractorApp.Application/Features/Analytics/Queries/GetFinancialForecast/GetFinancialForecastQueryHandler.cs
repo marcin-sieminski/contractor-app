@@ -147,6 +147,40 @@ public class GetFinancialForecastQueryHandler(
 
         var assumptions = BuildAssumptions(taxForm, zusStage, denom, actualThrough, vatRate);
 
+        // Scenariusz IP Box — liczony rocznie na zagregowanych sumach formy bazowej.
+        // Dostępny tylko dla liniowego i skali; ZUS, składka zdrowotna i VAT bez zmian.
+        IpBoxScenarioDto? ipBox = null;
+        if ((request.IpBoxEnabled ?? false)
+            && (taxForm == TaxForm.Liniowy || taxForm == TaxForm.Skala))
+        {
+            var pct = Math.Clamp(request.IpQualifyingPercent ?? 100m, 0m, 100m);
+            var q = pct / 100m;
+            var income = fullYear.Income;
+            var social = fullYear.ZusSocial;
+
+            var pitWithout = R(PolishTaxCalculator.BaseAnnualPit(taxForm, income, social));
+            var pitWith = R(PolishTaxCalculator.IpBoxAnnualPit(taxForm, income, social, q));
+            var savings = pitWithout - pitWith;
+
+            var vat = Math.Max(0m, fullYear.VatPayable);
+            var oblWithout = pitWithout + fullYear.ZusSocial + fullYear.ZusHealth + vat;
+            var oblWith = pitWith + fullYear.ZusSocial + fullYear.ZusHealth + vat;
+            var netWith = fullYear.Revenue - fullYear.Costs - pitWith - fullYear.ZusSocial - fullYear.ZusHealth;
+            var rev = fullYear.Revenue;
+
+            ipBox = new IpBoxScenarioDto(
+                pct, q, pitWithout, pitWith, savings, R(savings / 12),
+                R(oblWithout), R(oblWith), R(netWith),
+                rev > 0 ? Math.Round(oblWithout / rev * 100, 1) : 0m,
+                rev > 0 ? Math.Round(oblWith / rev * 100, 1) : 0m,
+                BuildIpBoxVerdict(savings),
+                IpBoxConditions());
+
+            assumptions.Add(
+                $"Scenariusz IP Box: 5% PIT na {pct:N0}% dochodu kwalifikowanego (Nexus {q:0.0#}); " +
+                "ZUS, składka zdrowotna i VAT bez zmian. Wymaga odrębnej ewidencji i interpretacji KIS.");
+        }
+
         return new FinancialForecastDto(
             year,
             TaxFormLabel(taxForm),
@@ -157,8 +191,26 @@ public class GetFinancialForecastQueryHandler(
             ytd,
             fullYear,
             months,
-            assumptions);
+            assumptions,
+            ipBox);
     }
+
+    private static string BuildIpBoxVerdict(decimal savings) => savings switch
+    {
+        > 20_000m => $"Zdecydowanie TAK – oszczędzasz {savings:N0} PLN rocznie ({savings / 12:N0} PLN/mies.). Prowadź ewidencję IP Box.",
+        > 5_000m => $"TAK – oszczędzasz {savings:N0} PLN rocznie. Sprawdź, czy koszty obsługi (doradca, KIS) nie zjadają korzyści.",
+        > 0m => $"Nieznaczna korzyść ({savings:N0} PLN/rok) – rozważ, czy formalności IP Box są warte tego wysiłku.",
+        _ => "NIE – IP Box nie generuje oszczędności przy tych danych."
+    };
+
+    private static List<string> IpBoxConditions() => new()
+    {
+        "Prawa IP muszą być wytworzone przez podatnika (programy komputerowe, algorytmy, API).",
+        "Wymagana odrębna ewidencja projektów IP z podziałem czasu i kosztów.",
+        "Współczynnik Nexus = A/(B+C+D); solo-developer bez zakupu IP → zazwyczaj 1,0.",
+        "Dostępny wyłącznie przy podatku liniowym 19% lub skali (nie ryczałt).",
+        "Zalecana interpretacja indywidualna KIS przed wdrożeniem (~3 mies.)."
+    };
 
     private static decimal Sum(decimal[] arr, int from, int to)
     {

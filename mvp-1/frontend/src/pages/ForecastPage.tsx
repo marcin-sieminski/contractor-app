@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { TrendingUp } from 'lucide-react'
 import { getFinancialForecast } from '../api/analytics'
 import { ForecastChart } from '../components/forecast/ForecastChart'
+import { IpBoxPanel } from '../components/forecast/IpBoxPanel'
 import { TAX_FORM_LABELS, ZUS_STAGE_LABELS } from '../types/forecast'
 import type { TaxFormKey, ZusStageKey } from '../types/forecast'
 
@@ -20,10 +21,20 @@ export function ForecastPage() {
   const [taxForm, setTaxForm] = useState<TaxFormKey>('liniowy')
   const [zusStage, setZusStage] = useState<ZusStageKey>('pelny')
   const [includeForecast, setIncludeForecast] = useState(true)
+  const [ipBoxEnabled, setIpBoxEnabled] = useState(false)
+  const [ipQualifyingPercent, setIpQualifyingPercent] = useState(100)
+
+  // IP Box dostępny tylko dla liniowego i skali (nie ryczałt).
+  const ipBoxApplicable = taxForm === 'liniowy' || taxForm === 'skala'
+  const ipBoxOn = ipBoxApplicable && ipBoxEnabled
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ['forecast', year, taxForm, zusStage, includeForecast],
-    queryFn: () => getFinancialForecast({ year, taxForm, zusStage, includeForecast }),
+    queryKey: ['forecast', year, taxForm, zusStage, includeForecast, ipBoxOn, ipQualifyingPercent],
+    queryFn: () => getFinancialForecast({
+      year, taxForm, zusStage, includeForecast,
+      ipBoxEnabled: ipBoxOn,
+      ipQualifyingPercent: ipBoxOn ? ipQualifyingPercent : undefined,
+    }),
   })
 
   return (
@@ -86,6 +97,50 @@ export function ForecastPage() {
             ))}
           </select>
         </label>
+
+        {ipBoxApplicable && (
+          <>
+            <label className="flex flex-col text-xs font-medium text-gray-500 dark:text-gray-400">
+              Scenariusz IP Box
+              <div className="mt-1 flex rounded-lg border border-gray-300 dark:border-gray-600 overflow-hidden text-sm">
+                <button
+                  onClick={() => setIpBoxEnabled(false)}
+                  className={`px-3 py-2 transition-colors whitespace-nowrap ${
+                    !ipBoxEnabled
+                      ? 'bg-violet-600 text-white'
+                      : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  Wył.
+                </button>
+                <button
+                  onClick={() => setIpBoxEnabled(true)}
+                  className={`px-3 py-2 transition-colors whitespace-nowrap border-l border-gray-300 dark:border-gray-600 ${
+                    ipBoxEnabled
+                      ? 'bg-violet-600 text-white'
+                      : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  Włącz
+                </button>
+              </div>
+            </label>
+
+            {ipBoxEnabled && (
+              <label className="flex flex-col text-xs font-medium text-gray-500 dark:text-gray-400">
+                % dochodu kwalifikowanego (IP)
+                <input
+                  type="number"
+                  min={0}
+                  max={100}
+                  value={ipQualifyingPercent}
+                  onChange={e => setIpQualifyingPercent(Math.min(100, Math.max(0, Number(e.target.value))))}
+                  className={`${selectCls} w-32`}
+                />
+              </label>
+            )}
+          </>
+        )}
       </div>
 
       {isLoading && <div className="text-gray-400 dark:text-gray-500 text-sm py-12 text-center">Ładowanie…</div>}
@@ -209,6 +264,8 @@ export function ForecastPage() {
               </div>
             )}
           </div>
+
+          {data.ipBox && <IpBoxPanel ipBox={data.ipBox} />}
 
           {includeForecast && (
             <div className="bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900 rounded-xl p-4">

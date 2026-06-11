@@ -11,12 +11,16 @@ namespace ContractorApp.Application.Features.Analytics.Queries.GetFinancialForec
 /// <param name="ZusStage">Etap ZUS: ulga_na_start | preferencyjny | pelny. Domyślnie pelny.</param>
 /// <param name="VatRate">Stawka VAT do szacunku VAT naliczonego z kosztów. Domyślnie 0,23.</param>
 /// <param name="IncludeForecast">Czy dołączać prognozę run-rate dla miesięcy bez danych. Domyślnie true.</param>
+/// <param name="IpBoxEnabled">Czy policzyć scenariusz ulgi IP Box (tylko liniowy/skala). Domyślnie false.</param>
+/// <param name="IpQualifyingPercent">Udział dochodu kwalifikowanego jako IP (0–100, współczynnik Nexus). Domyślnie 100.</param>
 public record GetFinancialForecastQuery(
     int? Year = null,
     string? TaxForm = null,
     string? ZusStage = null,
     decimal? VatRate = null,
-    bool? IncludeForecast = null) : IRequest<FinancialForecastDto>;
+    bool? IncludeForecast = null,
+    bool? IpBoxEnabled = null,
+    decimal? IpQualifyingPercent = null) : IRequest<FinancialForecastDto>;
 
 public record FinancialForecastDto(
     int Year,
@@ -28,7 +32,27 @@ public record FinancialForecastDto(
     ForecastTotalsDto Ytd,
     ForecastTotalsDto FullYear,
     List<MonthForecastDto> Months,
-    List<string> Assumptions);
+    List<string> Assumptions,
+    IpBoxScenarioDto? IpBox = null);
+
+/// <summary>
+/// Roczne porównanie obciążeń przy zastosowaniu ulgi IP Box (5% PIT na dochód kwalifikowany)
+/// względem formy bazowej. ZUS, składka zdrowotna i VAT pozostają bez zmian.
+/// </summary>
+public record IpBoxScenarioDto(
+    decimal QualifyingPercent,
+    decimal NexusCoefficient,
+    decimal AnnualPitWithout,
+    decimal AnnualPitWith,
+    decimal AnnualSavings,
+    decimal MonthlySavings,
+    decimal TotalObligationsWithout,
+    decimal TotalObligationsWith,
+    decimal NetCashFlowWith,
+    decimal EffectiveRateWithout,
+    decimal EffectiveRateWith,
+    string Verdict,
+    List<string> Conditions);
 
 public record MonthForecastDto(
     int Month,

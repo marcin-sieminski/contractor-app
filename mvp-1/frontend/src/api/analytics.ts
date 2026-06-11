@@ -7,4 +7,6 @@ export const getFinancialForecast = (params?: {
   zusStage?: ZusStageKey
   vatRate?: number
   includeForecast?: boolean
+  ipBoxEnabled?: boolean
+  ipQualifyingPercent?: number
 }) => api.get<FinancialForecast>('/analytics/forecast', { params }).then(r => r.data)
