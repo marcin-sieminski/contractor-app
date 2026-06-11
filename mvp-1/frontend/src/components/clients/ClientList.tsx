@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { getClients, createProject } from '../../api/clients'
-import { CheckCircle, Plus, X } from 'lucide-react'
+import { ClientForm } from './ClientForm'
+import type { Client } from '../../types/client'
+import { CheckCircle, Pencil, Plus, X } from 'lucide-react'
 
 const CURRENCIES = ['PLN', 'EUR', 'USD', 'GBP', 'CHF']
 
@@ -68,6 +70,7 @@ function AddProjectInline({ clientId, onDone }: { clientId: string; onDone: () =
 export function ClientList() {
   const { data: clients = [], isLoading } = useQuery({ queryKey: ['clients'], queryFn: getClients })
   const [addingProjectFor, setAddingProjectFor] = useState<string | null>(null)
+  const [editingClient, setEditingClient] = useState<Client | null>(null)
 
   if (isLoading) return <div className="text-gray-500 dark:text-gray-400 p-4 text-sm">Ładowanie...</div>
   if (clients.length === 0)
@@ -76,13 +79,20 @@ export function ClientList() {
   return (
     <div className="divide-y divide-gray-100 dark:divide-gray-700">
       {clients.map(c => (
-        <div key={c.id} className="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+        <div key={c.id} className="group px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50">
           <div className="flex items-center gap-2">
             <span className="font-medium text-gray-900 dark:text-gray-100">{c.name}</span>
             {c.isVerified && <CheckCircle size={14} className="text-green-500" />}
             {c.isEuVatPayer && (
               <span className="bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 text-xs px-2 py-0.5 rounded-full">VAT UE</span>
             )}
+            <button
+              onClick={() => setEditingClient(c)}
+              title="Edytuj klienta"
+              className="ml-auto text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              <Pencil size={14} />
+            </button>
           </div>
           <div className="text-gray-500 dark:text-gray-400 text-xs mt-0.5">NIP: {c.nip} · {c.city}</div>
 
@@ -107,6 +117,9 @@ export function ClientList() {
           )}
         </div>
       ))}
+      {editingClient && (
+        <ClientForm client={editingClient} onClose={() => setEditingClient(null)} />
+      )}
     </div>
   )
 }

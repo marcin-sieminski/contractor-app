@@ -1,19 +1,22 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { createClient } from '../../api/clients'
+import { createClient, updateClient } from '../../api/clients'
 import { useNipLookup } from '../../hooks/useNipLookup'
-import type { CompanyLookupResult } from '../../types/client'
+import type { Client, CompanyLookupResult } from '../../types/client'
 
-interface Props { onClose: () => void }
+interface Props { onClose: () => void; client?: Client }
 
 const inputCls = "w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
 
-export function ClientForm({ onClose }: Props) {
+export function ClientForm({ onClose, client }: Props) {
   const qc = useQueryClient()
+  const isEdit = !!client
   const [form, setForm] = useState({
-    name: '', nip: '', regon: '', street: '', city: '', postalCode: '', country: 'PL', isEuVatPayer: false
+    name: client?.name ?? '', nip: client?.nip ?? '', regon: client?.regon ?? '',
+    street: client?.street ?? '', city: client?.city ?? '', postalCode: client?.postalCode ?? '',
+    country: client?.country ?? 'PL', isEuVatPayer: client?.isEuVatPayer ?? false
   })
-  const [verified, setVerified] = useState(false)
+  const [verified, setVerified] = useState(client?.isVerified ?? false)
 
   const handleLookupResult = (r: CompanyLookupResult) => {
     setForm(f => ({
@@ -31,7 +34,7 @@ export function ClientForm({ onClose }: Props) {
   const { loading: nipLoading, error: nipError } = useNipLookup(form.nip, handleLookupResult)
 
   const mutation = useMutation({
-    mutationFn: () => createClient({ ...form }),
+    mutationFn: () => isEdit ? updateClient(client!.id, { ...form }) : createClient({ ...form }),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['clients'] }); onClose() }
   })
 
@@ -41,7 +44,7 @@ export function ClientForm({ onClose }: Props) {
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 w-full max-w-lg">
-        <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Dodaj klienta</h2>
+        <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">{isEdit ? 'Edytuj klienta' : 'Dodaj klienta'}</h2>
         <div className="space-y-3">
           <div>
             <label className="text-xs text-gray-500 dark:text-gray-400 mb-1 block">NIP</label>

@@ -1,4 +1,5 @@
 using ContractorApp.Application.Features.Clients.Commands.CreateClient;
+using ContractorApp.Application.Features.Clients.Commands.UpdateClient;
 using ContractorApp.Application.Features.Clients.Queries.GetClients;
 using ContractorApp.Application.Features.Clients.Queries.LookupCompanyByNip;
 using Microsoft.AspNetCore.Mvc;
@@ -17,6 +18,10 @@ public class ClientsController : BaseApiController
         var result = await Mediator.Send(cmd, ct);
         return CreatedAtAction(nameof(GetAll), new { id = result.Id }, result);
     }
+
+    [HttpPut("{id:guid}")]
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateClientCommand cmd, CancellationToken ct)
+        => Ok(await Mediator.Send(cmd with { Id = id }, ct));
 
     [HttpGet("lookup")]
     public async Task<IActionResult> Lookup([FromQuery] string nip, CancellationToken ct)

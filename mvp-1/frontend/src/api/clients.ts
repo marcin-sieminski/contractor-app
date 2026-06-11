@@ -6,6 +6,9 @@ export const getClients = () => api.get<Client[]>('/clients').then(r => r.data)
 export const createClient = (data: Omit<Client, 'id' | 'isVerified' | 'projects'>) =>
   api.post<Client>('/clients', data).then(r => r.data)
 
+export const updateClient = (id: string, data: Omit<Client, 'id' | 'isVerified' | 'projects'>) =>
+  api.put<Client>(`/clients/${id}`, data).then(r => r.data)
+
 export const lookupNip = (nip: string) =>
   api.get<CompanyLookupResult>(`/clients/lookup?nip=${nip}`).then(r => r.data)
 
