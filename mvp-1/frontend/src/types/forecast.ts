@@ -28,6 +28,7 @@ export interface MonthForecast {
   vatPayable: number
   totalObligations: number
   netCashFlow: number
+  isEdited: boolean
 }
 
 export interface ForecastTotals {

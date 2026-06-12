@@ -18,6 +18,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     public DbSet<ExchangeRate> ExchangeRates => Set<ExchangeRate>();
     public DbSet<Expense> Expenses => Set<Expense>();
     public DbSet<ExpenseReceipt> ExpenseReceipts => Set<ExpenseReceipt>();
+    public DbSet<ForecastOverride> ForecastOverrides => Set<ForecastOverride>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

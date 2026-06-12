@@ -13,6 +13,9 @@ namespace ContractorApp.Application.Features.Analytics.Queries.GetFinancialForec
 /// <param name="IncludeForecast">Czy dołączać prognozę run-rate dla miesięcy bez danych. Domyślnie true.</param>
 /// <param name="IpBoxEnabled">Czy policzyć scenariusz ulgi IP Box (tylko liniowy/skala). Domyślnie false.</param>
 /// <param name="IpQualifyingPercent">Udział dochodu kwalifikowanego jako IP (0–100, współczynnik Nexus). Domyślnie 100.</param>
+/// <param name="RevenueOverrides">Niezapisane korekty prognozowanego przychodu (miesiąc 1–12 → kwota netto PLN)
+/// do podglądu na żywo. Pierwszeństwo przed korektami zapisanymi w bazie. Tylko miesiące prognozy.</param>
+/// <param name="CostOverrides">Niezapisane korekty prognozowanych kosztów (miesiąc 1–12 → kwota brutto PLN), jak wyżej.</param>
 public record GetFinancialForecastQuery(
     int? Year = null,
     string? TaxForm = null,
@@ -20,7 +23,9 @@ public record GetFinancialForecastQuery(
     decimal? VatRate = null,
     bool? IncludeForecast = null,
     bool? IpBoxEnabled = null,
-    decimal? IpQualifyingPercent = null) : IRequest<FinancialForecastDto>;
+    decimal? IpQualifyingPercent = null,
+    IReadOnlyDictionary<int, decimal>? RevenueOverrides = null,
+    IReadOnlyDictionary<int, decimal>? CostOverrides = null) : IRequest<FinancialForecastDto>;
 
 public record FinancialForecastDto(
     int Year,
@@ -68,7 +73,8 @@ public record MonthForecastDto(
     decimal VatInput,
     decimal VatPayable,
     decimal TotalObligations,
-    decimal NetCashFlow);
+    decimal NetCashFlow,
+    bool IsEdited = false);
 
 public record ForecastTotalsDto(
     decimal Revenue,

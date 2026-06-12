@@ -1,7 +1,8 @@
-import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { TrendingUp } from 'lucide-react'
-import { getFinancialForecast } from '../api/analytics'
+import { useEffect, useState } from 'react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { CopyPlus, Eraser, Pencil, RotateCcw, TrendingUp } from 'lucide-react'
+import { getFinancialForecast, saveForecastOverrides } from '../api/analytics'
+import type { ForecastOverrideItem } from '../api/analytics'
 import { ForecastChart } from '../components/forecast/ForecastChart'
 import { IpBoxPanel } from '../components/forecast/IpBoxPanel'
 import { TAX_FORM_LABELS, ZUS_STAGE_LABELS } from '../types/forecast'
@@ -15,27 +16,116 @@ const ZUS_STAGES = Object.keys(ZUS_STAGE_LABELS) as ZusStageKey[]
 
 const selectCls = "mt-1 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800"
 
+// Słownik niezapisanych korekt {miesiąc: kwota} → "7:15000,8:16000" dla query API (podgląd na żywo).
+type Overrides = Record<number, number>
+const serializeOverrides = (o: Overrides): string | undefined => {
+  const s = Object.entries(o).map(([m, v]) => `${m}:${v}`).join(',')
+  return s.length > 0 ? s : undefined
+}
+
 export function ForecastPage() {
   const currentYear = new Date().getFullYear()
+  const qc = useQueryClient()
   const [year, setYear] = useState(currentYear)
+  const isFutureYear = year > currentYear
   const [taxForm, setTaxForm] = useState<TaxFormKey>('liniowy')
   const [zusStage, setZusStage] = useState<ZusStageKey>('pelny')
   const [includeForecast, setIncludeForecast] = useState(true)
   const [ipBoxEnabled, setIpBoxEnabled] = useState(false)
   const [ipQualifyingPercent, setIpQualifyingPercent] = useState(100)
 
+  // Ręczna edycja prognozy: niezapisane korekty przychodów/kosztów per miesiąc (podgląd na żywo).
+  const [editMode, setEditMode] = useState(false)
+  const [revenueOverrides, setRevenueOverrides] = useState<Overrides>({})
+  const [costOverrides, setCostOverrides] = useState<Overrides>({})
+  const hasOverrides =
+    Object.keys(revenueOverrides).length > 0 || Object.keys(costOverrides).length > 0
+
+  // Niezapisane korekty dotyczą konkretnego roku — przy zmianie roku je porzucamy.
+  useEffect(() => {
+    setRevenueOverrides({})
+    setCostOverrides({})
+    setEditMode(false)
+  }, [year])
+
+  const resetOverrides = () => {
+    setRevenueOverrides({})
+    setCostOverrides({})
+  }
+
+  const updateOverride = (kind: 'revenue' | 'cost', month: number, raw: string) => {
+    const setter = kind === 'revenue' ? setRevenueOverrides : setCostOverrides
+    setter(prev => {
+      const next = { ...prev }
+      if (raw.trim() === '') delete next[month]
+      else next[month] = Math.max(0, Number(raw))
+      return next
+    })
+  }
+
   // IP Box dostępny tylko dla liniowego i skali (nie ryczałt).
   const ipBoxApplicable = taxForm === 'liniowy' || taxForm === 'skala'
   const ipBoxOn = ipBoxApplicable && ipBoxEnabled
 
+  const revenueOverridesParam = serializeOverrides(revenueOverrides)
+  const costOverridesParam = serializeOverrides(costOverrides)
+
   const { data, isLoading, isError } = useQuery({
-    queryKey: ['forecast', year, taxForm, zusStage, includeForecast, ipBoxOn, ipQualifyingPercent],
+    queryKey: [
+      'forecast', year, taxForm, zusStage, includeForecast, ipBoxOn, ipQualifyingPercent,
+      revenueOverridesParam, costOverridesParam,
+    ],
     queryFn: () => getFinancialForecast({
       year, taxForm, zusStage, includeForecast,
       ipBoxEnabled: ipBoxOn,
       ipQualifyingPercent: ipBoxOn ? ipQualifyingPercent : undefined,
+      revenueOverrides: revenueOverridesParam,
+      costOverrides: costOverridesParam,
     }),
+    placeholderData: prev => prev,
   })
+
+  // Zapis trwałych korekt prognozy w bazie.
+  const saveMutation = useMutation({
+    mutationFn: (body: { action: 'save' | 'clear' | 'reset'; overrides?: ForecastOverrideItem[] }) =>
+      saveForecastOverrides(year, body),
+    onSuccess: () => {
+      resetOverrides()
+      setEditMode(false)
+      qc.invalidateQueries({ queryKey: ['forecast'] })
+    },
+  })
+
+  // "Gotowe" — zapisz edycje na stałe. Wysyłamy pełną parę (przychód, koszt) dla zmienionych
+  // miesięcy, używając wartości efektywnej (korekta lokalna lub aktualnie wyświetlana).
+  const saveEdits = () => {
+    if (!hasOverrides) {
+      setEditMode(false)
+      return
+    }
+    const months = new Set<number>([
+      ...Object.keys(revenueOverrides).map(Number),
+      ...Object.keys(costOverrides).map(Number),
+    ])
+    const byMonth = new Map(data?.months.map(m => [m.month, m]) ?? [])
+    const overrides: ForecastOverrideItem[] = [...months].map(m => ({
+      month: m,
+      revenue: revenueOverrides[m] ?? byMonth.get(m)?.revenue ?? 0,
+      cost: costOverrides[m] ?? byMonth.get(m)?.costs ?? 0,
+    }))
+    saveMutation.mutate({ action: 'save', overrides })
+  }
+
+  // "Wyczyść dane" — trwale wyzeruj prognozę roku.
+  const clearForecast = () => saveMutation.mutate({ action: 'clear' })
+  // "Przenieś z poprzedniego roku" — usuń korekty, wróć do prognozy automatycznej (carry-over).
+  const carryOverFromPreviousYear = () => saveMutation.mutate({ action: 'reset' })
+
+  // Stan bazy wyznaczamy z danych: brak ręcznych miesięcy = carry-over; same zera = wyczyszczone.
+  const forecastMonths = data?.months.filter(m => !m.isActual) ?? []
+  const anyEdited = forecastMonths.some(m => m.isEdited)
+  const isCleared = forecastMonths.length > 0 &&
+    forecastMonths.every(m => m.isEdited && m.revenue === 0 && m.costs === 0)
 
   return (
     <div className="p-6">
@@ -182,20 +272,79 @@ export function ForecastPage() {
           )}
 
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden mb-6">
-            <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+            <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between gap-3">
               <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">
                 {includeForecast ? `Prognoza miesięczna ${data.year}` : `Dane rzeczywiste ${data.year}`}
               </span>
-              <span className="text-xs text-gray-400 dark:text-gray-500">
-                {!includeForecast
-                  ? data.monthsWithData > 0
-                    ? `${data.monthsWithData} mies. z danymi`
-                    : 'brak danych rzeczywistych w wybranym roku'
-                  : data.monthsWithData > 0
-                    ? `dane rzeczywiste: ${data.monthsWithData} mies. · pozostałe = prognoza`
-                    : 'brak danych — prognoza zerowa'
-                }
-              </span>
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-gray-400 dark:text-gray-500 hidden sm:inline">
+                  {!includeForecast
+                    ? data.monthsWithData > 0
+                      ? `${data.monthsWithData} mies. z danymi`
+                      : 'brak danych rzeczywistych w wybranym roku'
+                    : isFutureYear
+                      ? isCleared
+                        ? 'dane wyzerowane — uzupełnij ręcznie'
+                        : `dane rzeczywiste i prognozowane skopiowane z ${year - 1} · możesz je edytować`
+                      : data.monthsWithData > 0
+                        ? `dane rzeczywiste: ${data.monthsWithData} mies. · pozostałe = prognoza`
+                        : 'brak danych — prognoza zerowa'
+                  }
+                </span>
+                {includeForecast && data.monthsWithData < 12 && (
+                  <>
+                    {isFutureYear && (
+                      <>
+                        <button
+                          onClick={carryOverFromPreviousYear}
+                          disabled={saveMutation.isPending}
+                          className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-lg border transition-colors disabled:opacity-50 ${
+                            !anyEdited
+                              ? 'bg-blue-600 border-blue-600 text-white'
+                              : 'border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                          }`}
+                          title={`Skopiuj przychody i koszty z ${year - 1}`}
+                        >
+                          <CopyPlus size={13} /> Przenieś z {year - 1}
+                        </button>
+                        <button
+                          onClick={clearForecast}
+                          disabled={saveMutation.isPending}
+                          className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-lg border transition-colors disabled:opacity-50 ${
+                            isCleared
+                              ? 'bg-blue-600 border-blue-600 text-white'
+                              : 'border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                          }`}
+                          title="Wyzeruj dane prognozy"
+                        >
+                          <Eraser size={13} /> Wyczyść dane
+                        </button>
+                      </>
+                    )}
+                    {editMode && hasOverrides && (
+                      <button
+                        onClick={resetOverrides}
+                        disabled={saveMutation.isPending}
+                        className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+                        title="Porzuć niezapisane zmiany"
+                      >
+                        <RotateCcw size={13} /> Cofnij zmiany
+                      </button>
+                    )}
+                    <button
+                      onClick={() => (editMode ? saveEdits() : setEditMode(true))}
+                      disabled={saveMutation.isPending}
+                      className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-lg border transition-colors disabled:opacity-50 ${
+                        editMode
+                          ? 'bg-blue-600 border-blue-600 text-white'
+                          : 'border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
+                      }`}
+                    >
+                      <Pencil size={13} /> {editMode ? (saveMutation.isPending ? 'Zapisywanie…' : 'Gotowe') : 'Edytuj prognozę'}
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
 
             {data.months.length === 0 ? (
@@ -219,21 +368,43 @@ export function ForecastPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {data.months.map(m => (
+                    {data.months.map(m => {
+                      const editable = editMode && !m.isActual
+                      return (
                       <tr
                         key={m.month}
-                        className={`border-b border-gray-50 dark:border-gray-700/50 last:border-0 ${m.isActual ? 'text-gray-900 dark:text-gray-100' : 'bg-slate-50/60 dark:bg-gray-900/40 text-gray-500 dark:text-gray-400'}`}
+                        className={`border-b border-gray-50 dark:border-gray-700/50 last:border-0 ${m.isActual ? 'text-gray-900 dark:text-gray-100' : 'bg-slate-50/60 dark:bg-gray-900/40 text-gray-500 dark:text-gray-400'} ${m.isEdited ? 'ring-1 ring-inset ring-blue-300 dark:ring-blue-700' : ''}`}
                       >
                         <td className="px-3 py-2 capitalize whitespace-nowrap">
                           {m.monthName}
                           {!m.isActual && (
-                            <span className="ml-2 text-[10px] uppercase tracking-wide text-blue-500 border border-blue-200 dark:border-blue-800 rounded px-1 py-0.5">
-                              prognoza
+                            <span className={`ml-2 text-[10px] uppercase tracking-wide rounded px-1 py-0.5 border ${m.isEdited ? 'text-blue-600 border-blue-300 dark:border-blue-700' : 'text-blue-500 border-blue-200 dark:border-blue-800'}`}>
+                              {m.isEdited ? 'ręcznie' : 'prognoza'}
                             </span>
                           )}
                         </td>
-                        <td className="px-3 py-2 text-right tabular-nums">{fmt(m.revenue)}</td>
-                        <td className="px-3 py-2 text-right tabular-nums">{fmt(m.costs)}</td>
+                        <td className="px-3 py-2 text-right tabular-nums">
+                          {editable ? (
+                            <input
+                              type="number"
+                              min={0}
+                              value={revenueOverrides[m.month] ?? m.revenue}
+                              onChange={e => updateOverride('revenue', m.month, e.target.value)}
+                              className="w-28 text-right tabular-nums border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                            />
+                          ) : fmt(m.revenue)}
+                        </td>
+                        <td className="px-3 py-2 text-right tabular-nums">
+                          {editable ? (
+                            <input
+                              type="number"
+                              min={0}
+                              value={costOverrides[m.month] ?? m.costs}
+                              onChange={e => updateOverride('cost', m.month, e.target.value)}
+                              className="w-28 text-right tabular-nums border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                            />
+                          ) : fmt(m.costs)}
+                        </td>
                         <td className="px-3 py-2 text-right tabular-nums">{fmt(m.incomeTax)}</td>
                         <td className="px-3 py-2 text-right tabular-nums">{fmt(m.zusSocial)}</td>
                         <td className="px-3 py-2 text-right tabular-nums">{fmt(m.zusHealth)}</td>
@@ -243,7 +414,8 @@ export function ForecastPage() {
                           {fmt(m.netCashFlow)}
                         </td>
                       </tr>
-                    ))}
+                      )
+                    })}
                   </tbody>
                   <tfoot>
                     <tr className="border-t-2 border-gray-200 dark:border-gray-600 font-semibold text-gray-800 dark:text-gray-200 bg-gray-50 dark:bg-gray-900">

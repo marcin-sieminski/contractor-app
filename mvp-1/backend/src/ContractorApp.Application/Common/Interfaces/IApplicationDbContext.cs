@@ -13,6 +13,7 @@ public interface IApplicationDbContext
     DbSet<ExchangeRate> ExchangeRates { get; }
     DbSet<Expense> Expenses { get; }
     DbSet<ExpenseReceipt> ExpenseReceipts { get; }
+    DbSet<ForecastOverride> ForecastOverrides { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
