@@ -64,9 +64,10 @@ public static class DependencyInjection
         services.AddScoped<IDeclarationXmlBuilder, Pit28XmlBuilder>();
         services.AddScoped<IDeclarationXmlBuilderFactory, DeclarationXmlBuilderFactory>();
 
-        // PDF rozliczenia rocznego (QuestPDF — licencja Community, przychód firmy < 1M USD)
+        // PDF rozliczenia rocznego i dokumentów finansowych (QuestPDF — licencja Community, przychód firmy < 1M USD)
         QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
         services.AddSingleton<ISettlementPdfGenerator, SettlementPdfGenerator>();
+        services.AddSingleton<IDocumentPdfGenerator, DocumentPdfGenerator>();
 
         // NBP
         services.AddHttpClient<NbpService>();
