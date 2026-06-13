@@ -28,6 +28,7 @@ public static class PolishTaxCalculator
     public const decimal LinearPitRate = 0.19m;   // 19% liniowy
     public const decimal IpBoxRate = 0.05m;       // 5% IP Box
     public const decimal TaxFreeAmount = 30_000m;       // kwota wolna (skala)
+    public const decimal TaxReducingAmount = 3_600m;    // kwota zmniejszająca podatek = 12% × kwota wolna
     public const decimal ProgressiveThreshold = 120_000m; // próg 32% (skala)
     public const decimal ScaleLowerRate = 0.12m;
     public const decimal ScaleUpperRate = 0.32m;
@@ -74,15 +75,21 @@ public static class PolishTaxCalculator
         Math.Max(0m, monthlyIncome - monthlyZusSocial) * LinearPitRate;
 
     /// <summary>
-    /// Roczny PIT wg skali podatkowej od podstawy (dochód − ZUS − kwota wolna).
+    /// Roczny PIT wg skali podatkowej od podstawy (dochód − ZUS społeczny), w pełnych złotych.
+    /// Formuła obowiązująca od 2022 r.: 12% × podstawa − kwota zmniejszająca (3600 zł);
+    /// powyżej progu: 10 800 + 32% × nadwyżki; nie mniej niż 0. Kwoty wolnej NIE odejmuje się
+    /// od podstawy — robi to kwota zmniejszająca. Ta sama formuła co
+    /// <see cref="AnnualSettlementCalculator.ScaleTax"/> (tu ze stałymi roku bieżącego).
     /// Używane kumulacyjnie do wyliczenia miesięcznej zaliczki.
     /// </summary>
     public static decimal ScaleAnnualPit(decimal annualTaxableBase)
     {
         if (annualTaxableBase <= 0m) return 0m;
-        return annualTaxableBase <= ProgressiveThreshold
-            ? annualTaxableBase * ScaleLowerRate
-            : ProgressiveThreshold * ScaleLowerRate + (annualTaxableBase - ProgressiveThreshold) * ScaleUpperRate;
+        var tax = annualTaxableBase <= ProgressiveThreshold
+            ? annualTaxableBase * ScaleLowerRate - TaxReducingAmount
+            : ProgressiveThreshold * ScaleLowerRate - TaxReducingAmount
+              + (annualTaxableBase - ProgressiveThreshold) * ScaleUpperRate;
+        return Math.Round(Math.Max(0m, tax), 0, MidpointRounding.AwayFromZero);
     }
 
     /// <summary>VAT naliczony zawarty w kwocie brutto (np. z kosztów z prawem do odliczenia).</summary>
@@ -91,13 +98,13 @@ public static class PolishTaxCalculator
 
     /// <summary>
     /// Roczny PIT formy bazowej (liniowy/skala) od dochodu pomniejszonego o ZUS społeczny.
-    /// Dla skali uwzględnia kwotę wolną i próg 32%.
+    /// Dla skali stosuje kwotę zmniejszającą i próg 32%.
     /// </summary>
     public static decimal BaseAnnualPit(TaxForm form, decimal annualIncome, decimal annualZusSocial)
     {
         var baseAfterZus = Math.Max(0m, annualIncome - annualZusSocial);
         return form == TaxForm.Skala
-            ? ScaleAnnualPit(Math.Max(0m, baseAfterZus - TaxFreeAmount))
+            ? ScaleAnnualPit(baseAfterZus)
             : baseAfterZus * LinearPitRate; // liniowy 19%
     }
 
@@ -113,7 +120,7 @@ public static class PolishTaxCalculator
         var ipBase = baseAfterZus * q;
         var nonIpBase = baseAfterZus * (1m - q);
         var nonIpPit = form == TaxForm.Skala
-            ? ScaleAnnualPit(Math.Max(0m, nonIpBase - TaxFreeAmount))
+            ? ScaleAnnualPit(nonIpBase)
             : nonIpBase * LinearPitRate;
         return ipBase * IpBoxRate + nonIpPit;
     }

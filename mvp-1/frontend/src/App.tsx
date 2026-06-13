@@ -7,6 +7,7 @@ import { ClientsPage } from './pages/ClientsPage'
 import { InvoicesPage } from './pages/InvoicesPage'
 import { ExpensesPage } from './pages/ExpensesPage'
 import { ForecastPage } from './pages/ForecastPage'
+import { SettlementPage } from './pages/SettlementPage'
 import { ChatPage } from './pages/ChatPage'
 import { SettingsPage } from './pages/SettingsPage'
 import { LoginPage } from './pages/LoginPage'
@@ -26,6 +27,7 @@ export default function App() {
           <Route path="invoices" element={<InvoicesPage />} />
           <Route path="expenses" element={<ExpensesPage />} />
           <Route path="forecast" element={<ForecastPage />} />
+          <Route path="settlement" element={<SettlementPage />} />
           <Route path="chat" element={<ChatPage />} />
           <Route path="settings" element={<SettingsPage />} />
         </Route>

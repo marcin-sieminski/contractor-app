@@ -14,6 +14,7 @@ public interface IApplicationDbContext
     DbSet<Expense> Expenses { get; }
     DbSet<ExpenseReceipt> ExpenseReceipts { get; }
     DbSet<ForecastOverride> ForecastOverrides { get; }
+    DbSet<AnnualSettlement> AnnualSettlements { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

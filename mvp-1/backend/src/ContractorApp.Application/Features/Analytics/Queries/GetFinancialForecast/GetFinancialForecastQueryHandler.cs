@@ -199,7 +199,7 @@ public class GetFinancialForecastQueryHandler(
                     incomeTax = PolishTaxCalculator.RyczaltMonthlyPit(revenue);
                     break;
                 case TaxForm.Skala:
-                    var cumBase = Math.Max(0m, cumIncome - cumZus - PolishTaxCalculator.TaxFreeAmount);
+                    var cumBase = Math.Max(0m, cumIncome - cumZus);
                     var scaleTax = PolishTaxCalculator.ScaleAnnualPit(cumBase);
                     incomeTax = Math.Max(0m, scaleTax - prevScaleTax);
                     prevScaleTax = Math.Max(prevScaleTax, scaleTax); // brak ujemnych zaliczek przy spadku dochodu

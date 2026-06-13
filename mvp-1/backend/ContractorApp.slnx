@@ -6,4 +6,7 @@
     <Project Path="src/ContractorApp.Infrastructure/ContractorApp.Infrastructure.csproj" />
     <Project Path="src/ContractorApp.Mcp.Api/ContractorApp.Mcp.Api.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/ContractorApp.Application.Tests/ContractorApp.Application.Tests.csproj" />
+  </Folder>
 </Solution>

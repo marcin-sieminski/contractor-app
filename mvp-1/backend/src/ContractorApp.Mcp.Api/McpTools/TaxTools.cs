@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using ContractorApp.Application.Common.Tax;
 using ContractorApp.Application.Features.Invoices.Queries.GetFinancialSummary;
 using MediatR;
 using ModelContextProtocol.Server;
@@ -34,10 +35,6 @@ public class TaxTools(ISender mediator)
     private static readonly decimal HealthLinear = 0.049m; // 4,9% zdrowotna liniowy
     private static readonly decimal HealthScale  = 0.09m;  // 9,0% zdrowotna skala
 
-    // Skala podatkowa
-    private const decimal TaxFree          = 30_000m;  // kwota wolna od podatku
-    private const decimal ProgressiveBreak = 120_000m; // próg 32%
-
     // ── Narzędzie 1: Porównanie form podatkowych ────────────────────────────────
 
     [McpServerTool(Name = "compare_tax_forms")]
@@ -68,11 +65,8 @@ public class TaxTools(ISender mediator)
         var healthLinear = Math.Max(HealthMin, annualIncome / 12 * HealthLinear) * 12;
         var totalLinear  = taxLinear + healthLinear + annualSocial;
 
-        // Skala 12%/32% – odliczamy kwotę wolną 30 000 PLN
-        var taxableSkala = Math.Max(0, annualIncome - annualSocial - TaxFree);
-        var taxSkala = taxableSkala <= ProgressiveBreak
-            ? Math.Round(taxableSkala * 0.12m, 0)
-            : Math.Round(ProgressiveBreak * 0.12m + (taxableSkala - ProgressiveBreak) * 0.32m, 0);
+        // Skala 12%/32% – formuła z kwotą zmniejszającą (wspólna implementacja)
+        var taxSkala = PolishTaxCalculator.ScaleAnnualPit(Math.Max(0, annualIncome - annualSocial));
         var healthSkala = Math.Max(HealthMin, annualIncome / 12 * HealthScale) * 12;
         var totalSkala  = taxSkala + healthSkala + annualSocial;
 
@@ -220,10 +214,7 @@ public class TaxTools(ISender mediator)
                 health = RyczaltHealthMonth(annualRevenue) * 12;
                 break;
             case "skala":
-                var taxableSkala = Math.Max(0, annualIncome - annualSocial - TaxFree);
-                tax = taxableSkala <= ProgressiveBreak
-                    ? Math.Round(taxableSkala * 0.12m, 0)
-                    : Math.Round(ProgressiveBreak * 0.12m + (taxableSkala - ProgressiveBreak) * 0.32m, 0);
+                tax    = PolishTaxCalculator.ScaleAnnualPit(Math.Max(0, annualIncome - annualSocial));
                 health = Math.Max(HealthMin, annualIncome / 12 * HealthScale) * 12;
                 break;
             default: // liniowy

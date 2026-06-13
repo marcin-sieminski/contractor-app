@@ -19,6 +19,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     public DbSet<Expense> Expenses => Set<Expense>();
     public DbSet<ExpenseReceipt> ExpenseReceipts => Set<ExpenseReceipt>();
     public DbSet<ForecastOverride> ForecastOverrides => Set<ForecastOverride>();
+    public DbSet<AnnualSettlement> AnnualSettlements => Set<AnnualSettlement>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
