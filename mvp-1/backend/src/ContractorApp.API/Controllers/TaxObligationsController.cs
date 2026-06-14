@@ -9,6 +9,7 @@ namespace ContractorApp.API.Controllers;
 /// Tracker zobowiązań podatkowych: naliczone ZUS/PIT/VAT per miesiąc
 /// oraz rejestr rzeczywistych wpłat — "co już zapłaciłem vs. co jeszcze muszę".
 /// </summary>
+[Route("api/v1/tax-obligations")]
 public class TaxObligationsController : BaseApiController
 {
     /// <summary>
