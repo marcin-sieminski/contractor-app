@@ -11,6 +11,8 @@ public class TimeEntry : Entity
     public string Description { get; set; } = string.Empty;
     public bool IsInvoiced { get; set; }
     public Guid? InvoiceId { get; set; }
+    public bool IsIpWork { get; set; } = false;
+    public string? IpWorkDescription { get; set; }
     public DateTimeOffset? DeletedAt { get; set; }
     public bool IsPaused { get; set; }
     public int AccumulatedSeconds { get; set; }

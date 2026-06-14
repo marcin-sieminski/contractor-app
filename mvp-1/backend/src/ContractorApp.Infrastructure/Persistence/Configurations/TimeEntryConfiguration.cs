@@ -10,6 +10,7 @@ public class TimeEntryConfiguration : IEntityTypeConfiguration<TimeEntry>
     {
         builder.HasKey(t => t.Id);
         builder.Property(t => t.Description).HasMaxLength(500);
+        builder.Property(t => t.IpWorkDescription).HasMaxLength(1000);
         builder.HasQueryFilter(t => t.DeletedAt == null);
         builder.HasIndex(t => t.ProjectId);
         builder.HasIndex(t => t.IsInvoiced);

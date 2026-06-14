@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom'
-import { Clock, Users, FileText, FileCheck, FileSpreadsheet, LayoutDashboard, LogOut, Receipt, MessageCircle, TrendingUp, Settings, Landmark, BarChart2, CalendarDays, Waves, Globe } from 'lucide-react'
+import { Clock, Users, FileText, FileCheck, FileSpreadsheet, LayoutDashboard, LogOut, Receipt, MessageCircle, TrendingUp, Settings, Landmark, BarChart2, CalendarDays, Waves, Globe, Cpu } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { GlobalTimerBar } from '../timer/GlobalTimerBar'
 
@@ -15,6 +15,7 @@ const nav = [
   { to: '/work-analytics', icon: CalendarDays, label: 'Analiza czasu pracy' },
   { to: '/cash-flow', icon: Waves, label: 'Cash Flow' },
   { to: '/currency-exposure', icon: Globe, label: 'Waluty' },
+  { to: '/ip-box', icon: Cpu, label: 'IP Box' },
   { to: '/tax-obligations', icon: Landmark, label: 'Zobowiązania' },
   { to: '/documents', icon: FileSpreadsheet, label: 'Dokumenty' },
   { to: '/chat', icon: MessageCircle, label: 'Asystent AI' },
