@@ -11,6 +11,8 @@ import { SettlementPage } from './pages/SettlementPage'
 import { DocumentsPage } from './pages/DocumentsPage'
 import { TaxObligationsPage } from './pages/TaxObligationsPage'
 import { ProfitabilityPage } from './pages/ProfitabilityPage'
+import { WorkAnalyticsPage } from './pages/WorkAnalyticsPage'
+import { CashFlowPage } from './pages/CashFlowPage'
 import { ChatPage } from './pages/ChatPage'
 import { SettingsPage } from './pages/SettingsPage'
 import { LoginPage } from './pages/LoginPage'
@@ -34,6 +36,8 @@ export default function App() {
           <Route path="documents" element={<DocumentsPage />} />
           <Route path="tax-obligations" element={<TaxObligationsPage />} />
           <Route path="profitability" element={<ProfitabilityPage />} />
+          <Route path="work-analytics" element={<WorkAnalyticsPage />} />
+          <Route path="cash-flow" element={<CashFlowPage />} />
           <Route path="chat" element={<ChatPage />} />
           <Route path="settings" element={<SettingsPage />} />
         </Route>

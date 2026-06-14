@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom'
-import { Clock, Users, FileText, FileCheck, FileSpreadsheet, LayoutDashboard, LogOut, Receipt, MessageCircle, TrendingUp, Settings, Landmark, BarChart2 } from 'lucide-react'
+import { Clock, Users, FileText, FileCheck, FileSpreadsheet, LayoutDashboard, LogOut, Receipt, MessageCircle, TrendingUp, Settings, Landmark, BarChart2, CalendarDays, Waves } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { GlobalTimerBar } from '../timer/GlobalTimerBar'
 
@@ -12,6 +12,8 @@ const nav = [
   { to: '/forecast', icon: TrendingUp, label: 'Analiza finansowa' },
   { to: '/settlement', icon: FileCheck, label: 'Rozliczenie roczne' },
   { to: '/profitability', icon: BarChart2, label: 'Rentowność' },
+  { to: '/work-analytics', icon: CalendarDays, label: 'Analiza czasu pracy' },
+  { to: '/cash-flow', icon: Waves, label: 'Cash Flow' },
   { to: '/tax-obligations', icon: Landmark, label: 'Zobowiązania' },
   { to: '/documents', icon: FileSpreadsheet, label: 'Dokumenty' },
   { to: '/chat', icon: MessageCircle, label: 'Asystent AI' },
