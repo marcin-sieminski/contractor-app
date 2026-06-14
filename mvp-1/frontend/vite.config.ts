@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 5173,
+    port: process.env.PORT ? parseInt(process.env.PORT) : 5173,
     proxy: {
       // Czat AI / asystent — osobny host ContractorApp.Mcp.Api.
       // Musi być PRZED ogólną regułą '/api', bo Vite dopasowuje po prefiksie.
