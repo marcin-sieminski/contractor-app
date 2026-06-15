@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 
-export type Theme = 'light' | 'dark' | 'gray' | 'system'
+export type Theme = 'light' | 'dark' | 'gray' | 'modern' | 'system'
 type ResolvedTheme = 'light' | 'dark'
 
 interface ThemeContextValue {
@@ -30,13 +30,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   const resolvedTheme: ResolvedTheme =
     theme === 'system' ? getSystemTheme() :
-    theme === 'gray' ? 'light' :
+    theme === 'gray' || theme === 'modern' ? 'light' :
     theme
 
   useEffect(() => {
     const html = document.documentElement
     html.classList.toggle('dark', resolvedTheme === 'dark')
     html.classList.toggle('gray', theme === 'gray')
+    html.classList.toggle('modern', theme === 'modern')
   }, [theme, resolvedTheme])
 
   useEffect(() => {

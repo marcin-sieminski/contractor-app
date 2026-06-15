@@ -17,3 +17,11 @@ html.gray body {
 html.gray .recharts-responsive-container {
   filter: saturate(2.86) brightness(1.087);
 }
+
+/* "Nowoczesny" — ciepły, jasny schemat. Pojedynczy filtr na body przesuwa
+   cały interfejs (wraz z wykresami) w stronę jasnej, ciepłej, złocistej palety,
+   utrzymując ciemny, czytelny tekst na kremowym tle. W przeciwieństwie do
+   schematu szarego NIE neutralizujemy wykresów — mają być ciepłe jak reszta UI. */
+html.modern body {
+  filter: sepia(0.45) saturate(1.55) hue-rotate(-12deg) brightness(1.03);
+}

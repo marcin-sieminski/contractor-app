@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Monitor, Moon, Sun, Contrast } from 'lucide-react'
+import { Monitor, Moon, Sun, Contrast, Sparkles } from 'lucide-react'
 import { useTheme, type Theme } from '../context/ThemeContext'
 import { useAuth } from '../context/AuthContext'
 import { profileApi } from '../api/profile'
@@ -15,6 +15,7 @@ const THEME_OPTIONS: ThemeOption[] = [
   { value: 'light',  label: 'Jasny',      icon: Sun,      description: 'Zawsze jasne tło' },
   { value: 'dark',   label: 'Ciemny',     icon: Moon,     description: 'Zawsze ciemne tło' },
   { value: 'gray',   label: 'Szary',      icon: Contrast, description: 'Odcienie szarości' },
+  { value: 'modern', label: 'Nowoczesny', icon: Sparkles, description: 'Ciepłe, jasne barwy' },
   { value: 'system', label: 'Systemowy',  icon: Monitor,  description: 'Dopasuj do ustawień systemu' },
 ]
 
