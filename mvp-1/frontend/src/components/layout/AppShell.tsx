@@ -27,7 +27,8 @@ export function AppShell() {
   return (
     <div className="flex h-screen bg-gray-50 dark:bg-gray-950">
       <aside className="w-56 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 flex flex-col p-4 gap-1">
-        <div className="font-bold text-xl text-blue-600 mb-6 px-2">ContractorHub</div>
+        <div className="font-bold text-xl text-blue-600 px-2">ContractorHub</div>
+        <div className="px-2 mb-4 mt-1 text-xs text-gray-400 dark:text-gray-500 truncate">{user?.displayName || user?.email}</div>
         {nav.map(({ to, icon: Icon, label }) => (
           <NavLink
             key={to}
@@ -60,7 +61,6 @@ export function AppShell() {
             <Settings size={18} />
             Ustawienia
           </NavLink>
-          <div className="px-2 mb-2 text-xs text-gray-400 dark:text-gray-500 truncate">{user?.displayName || user?.email}</div>
           <button
             onClick={logout}
             className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 w-full transition-colors"
