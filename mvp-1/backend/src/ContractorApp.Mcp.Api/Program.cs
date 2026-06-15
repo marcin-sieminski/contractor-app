@@ -46,7 +46,14 @@ builder.Services.AddMcpServer()
     .WithTools<ClientTools>()
     .WithTools<ExpenseTools>()
     .WithTools<DeadlineTools>()
-    .WithTools<TaxTools>();
+    .WithTools<TaxTools>()
+    .WithTools<AnalyticsTools>()
+    .WithTools<IpBoxTools>()
+    .WithTools<DocumentTools>()
+    .WithTools<SettlementTools>()
+    .WithTools<ProjectTools>()
+    .WithTools<AdvisorTools>()
+    .WithTools<TaxObligationTools>();
 
 builder.Services.Configure<OllamaOptions>(builder.Configuration.GetSection("Ollama"));
 builder.Services.AddHttpClient<OllamaService>((sp, http) =>
@@ -62,6 +69,13 @@ builder.Services.AddScoped<ClientTools>();
 builder.Services.AddScoped<ExpenseTools>();
 builder.Services.AddScoped<DeadlineTools>();
 builder.Services.AddScoped<TaxTools>();
+builder.Services.AddScoped<AnalyticsTools>();
+builder.Services.AddScoped<IpBoxTools>();
+builder.Services.AddScoped<DocumentTools>();
+builder.Services.AddScoped<SettlementTools>();
+builder.Services.AddScoped<ProjectTools>();
+builder.Services.AddScoped<AdvisorTools>();
+builder.Services.AddScoped<TaxObligationTools>();
 
 builder.Services.AddSingleton<McpToolRegistry>();
 

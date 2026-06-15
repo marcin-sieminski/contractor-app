@@ -16,6 +16,8 @@ public interface IApplicationDbContext
     DbSet<ForecastOverride> ForecastOverrides { get; }
     DbSet<AnnualSettlement> AnnualSettlements { get; }
     DbSet<TaxPayment> TaxPayments { get; }
+    DbSet<Conversation> Conversations { get; }
+    DbSet<ConversationMessage> ConversationMessages { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

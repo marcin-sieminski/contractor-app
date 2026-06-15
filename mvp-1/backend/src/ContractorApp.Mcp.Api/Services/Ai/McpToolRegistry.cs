@@ -38,6 +38,14 @@ public class McpToolRegistry
 
     public record ProviderTool(string Name, string Description, JsonObject Schema);
 
+    /// <summary>Czy narzędzie wymaga potwierdzenia użytkownika przed wykonaniem.</summary>
+    public bool RequiresConfirmation(string toolName)
+        => _byName.TryGetValue(toolName, out var d) && d.ConfirmationDescription is not null;
+
+    /// <summary>Opis akcji dla potwierdzenia (lub null, jeśli narzędzie nie wymaga potwierdzenia).</summary>
+    public string? GetConfirmationDescription(string toolName)
+        => _byName.TryGetValue(toolName, out var d) ? d.ConfirmationDescription : null;
+
     public async Task<string> InvokeAsync(
         string toolName,
         JsonElement arguments,
@@ -108,8 +116,9 @@ public class McpToolRegistry
 
                 var name = toolAttr.Name ?? method.Name;
                 var desc = method.GetCustomAttribute<DescriptionAttribute>()?.Description ?? string.Empty;
+                var confirm = method.GetCustomAttribute<RequiresConfirmationAttribute>()?.ActionDescription;
 
-                result.Add(new ToolDescriptor(name, desc, type, method));
+                result.Add(new ToolDescriptor(name, desc, type, method, confirm));
             }
         }
 
@@ -278,5 +287,6 @@ public class McpToolRegistry
         return null;
     }
 
-    public record ToolDescriptor(string Name, string Description, Type DeclaringType, MethodInfo Method);
+    public record ToolDescriptor(
+        string Name, string Description, Type DeclaringType, MethodInfo Method, string? ConfirmationDescription);
 }

@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.Json;
 using Anthropic.SDK;
 using Anthropic.SDK.Messaging;
@@ -38,7 +40,7 @@ public class ClaudeService : IAiChatProvider
         var model = !string.IsNullOrWhiteSpace(request.ModelOverride) ? request.ModelOverride : _opts.DefaultModel;
 
         var messages = BuildMessages(request.Messages);
-        var tools = BuildClaudeTools(registry);
+        List<CommonTool>? tools = request.ToolsDisabled ? null : BuildClaudeTools(registry);
         var toolSummaries = new List<ToolCallSummary>();
 
         for (int iteration = 0; iteration < _opts.MaxToolIterations; iteration++)
@@ -70,6 +72,20 @@ public class ClaudeService : IAiChatProvider
             {
                 var text = string.Join("", response.Content.OfType<TextContent>().Select(b => b.Text));
                 return new AiChatResult(text, toolSummaries, model, true);
+            }
+
+            var gated = toolUseBlocks.FirstOrDefault(tu => registry.RequiresConfirmation(tu.Name));
+            if (gated is not null)
+            {
+                using var gdoc = JsonDocument.Parse(gated.Input?.ToJsonString() ?? "{}");
+                var leadText = string.Join("", response.Content.OfType<TextContent>().Select(b => b.Text));
+                return new AiChatResult(leadText, toolSummaries, model, true)
+                {
+                    PendingAction = new PendingActionInfo(
+                        gated.Name,
+                        registry.GetConfirmationDescription(gated.Name) ?? gated.Name,
+                        gdoc.RootElement.Clone())
+                };
             }
 
             messages.Add(response.Message);
@@ -107,6 +123,96 @@ public class ClaudeService : IAiChatProvider
                        ?? "(Przekroczono limit wywołań narzędzi)";
 
         return new AiChatResult(lastText, toolSummaries, model, true);
+    }
+
+    public async IAsyncEnumerable<AiStreamEvent> ChatStreamAsync(
+        AiChatRequest request, McpToolRegistry registry, [EnumeratorCancellation] CancellationToken ct)
+    {
+        var apiKey = !string.IsNullOrWhiteSpace(_opts.ApiKey)
+            ? _opts.ApiKey
+            : Environment.GetEnvironmentVariable("ANTHROPIC_API_KEY")
+              ?? throw new InvalidOperationException(
+                  "Klucz API Claude nie jest skonfigurowany. Ustaw Claude:ApiKey w konfiguracji lub zmienną środowiskową ANTHROPIC_API_KEY.");
+
+        var client = new AnthropicClient(apiKey);
+        var model = !string.IsNullOrWhiteSpace(request.ModelOverride) ? request.ModelOverride : _opts.DefaultModel;
+
+        var messages = BuildMessages(request.Messages);
+        List<CommonTool>? tools = request.ToolsDisabled ? null : BuildClaudeTools(registry);
+        var toolSummaries = new List<ToolCallSummary>();
+
+        for (int iteration = 0; iteration < _opts.MaxToolIterations; iteration++)
+        {
+            var parameters = new MessageParameters
+            {
+                Model = model,
+                Messages = messages,
+                MaxTokens = _opts.MaxTokens,
+                SystemMessage = _opts.SystemPrompt,
+                Temperature = (decimal?)_opts.Temperature,
+            };
+
+            var response = await client.Messages.GetClaudeMessageAsync(parameters, tools, ct);
+            var toolUseBlocks = response.Content.OfType<ToolUseContent>().ToList();
+
+            if (toolUseBlocks.Count == 0 || response.StopReason == "end_turn")
+            {
+                // Finalna odpowiedź — strumieniujemy tokeny prosto z modelu (bez narzędzi → czysty tekst).
+                var sb = new StringBuilder();
+                await foreach (var chunk in client.Messages.StreamClaudeMessageAsync(parameters, null, ct))
+                {
+                    var delta = chunk.Delta?.Text;
+                    if (!string.IsNullOrEmpty(delta))
+                    {
+                        sb.Append(delta);
+                        yield return new AiTextDelta(delta);
+                    }
+                }
+
+                var finalText = sb.Length > 0
+                    ? sb.ToString()
+                    : string.Join("", response.Content.OfType<TextContent>().Select(b => b.Text));
+                yield return new AiCompleted(finalText, toolSummaries, model, true);
+                yield break;
+            }
+
+            var gated = toolUseBlocks.FirstOrDefault(tu => registry.RequiresConfirmation(tu.Name));
+            if (gated is not null)
+            {
+                using var gdoc = JsonDocument.Parse(gated.Input?.ToJsonString() ?? "{}");
+                yield return new AiPendingAction(new PendingActionInfo(
+                    gated.Name,
+                    registry.GetConfirmationDescription(gated.Name) ?? gated.Name,
+                    gdoc.RootElement.Clone()));
+                yield break;
+            }
+
+            messages.Add(response.Message);
+
+            var resultBlocks = new List<ContentBase>();
+            foreach (var tu in toolUseBlocks)
+            {
+                yield return new AiToolStarted(tu.Name);
+
+                var argsJson = tu.Input?.ToJsonString() ?? "{}";
+                using var doc = JsonDocument.Parse(argsJson);
+                var args = doc.RootElement.Clone();
+
+                var resultJson = await registry.InvokeAsync(tu.Name, args, request.RequestServices, ct);
+
+                using var resultDoc = JsonDocument.Parse(resultJson);
+                toolSummaries.Add(new ToolCallSummary(tu.Name, args, resultDoc.RootElement.Clone()));
+
+                resultBlocks.Add(new ToolResultContent { ToolUseId = tu.Id, Content = resultJson });
+            }
+
+            messages.Add(new Message { Role = RoleType.User, Content = resultBlocks });
+        }
+
+        var lastMsg = messages.LastOrDefault(m => m.Role == RoleType.Assistant);
+        var lastText = lastMsg?.Content?.OfType<TextContent>().FirstOrDefault()?.Text
+                       ?? "(Przekroczono limit wywołań narzędzi)";
+        yield return new AiCompleted(lastText, toolSummaries, model, true);
     }
 
     private static List<Message> BuildMessages(List<AiMessage> aiMessages)
