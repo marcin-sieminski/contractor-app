@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { updateTimeEntry } from '../../api/timeEntries'
 import { getProjects } from '../../api/clients'
+import { useClientNameById } from '../../hooks/useClientNameById'
+import { shortClientName } from '../../lib/clientName'
 import { format } from 'date-fns'
 import type { TimeEntry } from '../../types/timeEntry'
 
@@ -13,6 +15,7 @@ interface Props {
 export function EditTimeEntryModal({ entry, onClose }: Props) {
   const qc = useQueryClient()
   const { data: projects = [] } = useQuery({ queryKey: ['projects'], queryFn: () => getProjects() })
+  const clientNameById = useClientNameById()
 
   const startDate = new Date(entry.startedAt)
   const stopDate = entry.stoppedAt ? new Date(entry.stoppedAt) : new Date()
@@ -48,7 +51,14 @@ export function EditTimeEntryModal({ entry, onClose }: Props) {
             className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
           >
             <option value="">Projekt...</option>
-            {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+            {projects.map(p => {
+              const client = clientNameById.get(p.clientId)
+              return (
+                <option key={p.id} value={p.id}>
+                  {client ? `${p.name} (${shortClientName(client)})` : p.name}
+                </option>
+              )
+            })}
           </select>
           <input
             type="date"

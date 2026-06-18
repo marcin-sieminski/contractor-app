@@ -24,6 +24,45 @@ function formatSize(bytes: number): string {
   return (bytes / 1e9).toFixed(1) + ' GB'
 }
 
+// Przykładowe pytania na ekranie startowym — odzwierciedlają możliwości
+// zaimplementowanych narzędzi MCP (analizy + akcje na danych użytkownika).
+const SUGGESTION_GROUPS: { title: string; items: string[] }[] = [
+  {
+    title: 'Finanse i podatki',
+    items: [
+      'Jak stoję finansowo w tym roku?',
+      'Ile zostanie mi na rękę po podatkach?',
+      'Która forma opodatkowania mi się opłaca — ryczałt, liniowy czy skala?',
+      'Czy opłaca mi się IP Box?',
+    ],
+  },
+  {
+    title: 'Płynność, ZUS i terminy',
+    items: [
+      'Czy starczy mi na najbliższy ZUS i podatki?',
+      'Jakie mam nadchodzące terminy ZUS, VAT i PIT?',
+      'Ile zalegam z podatkami i ZUS?',
+      'Co wymaga teraz mojej uwagi?',
+    ],
+  },
+  {
+    title: 'Klienci, praca i waluty',
+    items: [
+      'Który klient jest dla mnie najbardziej opłacalny?',
+      'Ile mam niezafakturowanych godzin?',
+      'Jak duże jest moje ryzyko walutowe przy EUR/USD?',
+    ],
+  },
+  {
+    title: 'Asystent może też wykonać',
+    items: [
+      'Wystaw fakturę dla klienta za poprzedni miesiąc',
+      'Sprawdź kontrahenta po numerze NIP',
+      'Uruchom licznik czasu dla projektu',
+    ],
+  },
+]
+
 export function ChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [input, setInput] = useState('')
@@ -36,6 +75,7 @@ export function ChatPage() {
   const [isStreaming, setIsStreaming] = useState(false)
   const abortRef = useRef<AbortController | null>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
   const queryClient = useQueryClient()
 
   const { data: conversations = [] } = useQuery({
@@ -222,6 +262,11 @@ export function ChatPage() {
     }
   }
 
+  function applySuggestion(text: string) {
+    setInput(text)
+    requestAnimationFrame(() => textareaRef.current?.focus())
+  }
+
   const currentModel = allModels.find(m => m.name === selectedModel)
 
   return (
@@ -309,14 +354,33 @@ export function ChatPage() {
       <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-3 pr-2">
         {messages.length === 0 && (
           <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 text-sm text-gray-600 dark:text-gray-300">
-            <div className="font-medium text-gray-800 dark:text-gray-200 mb-2">Zapytaj asystenta o:</div>
-            <ul className="space-y-1 list-disc list-inside">
-              <li>"Jak stoję finansowo w tym roku?"</li>
-              <li>"Co wymaga teraz mojej uwagi?"</li>
-              <li>"Czy opłaca mi się IP Box?"</li>
-              <li>"Czy starczy mi na najbliższy ZUS i podatki?"</li>
-              <li>"Który klient jest dla mnie najbardziej opłacalny?"</li>
-            </ul>
+            <div className="font-medium text-gray-800 dark:text-gray-200 mb-1">
+              Zapytaj asystenta — ma dostęp do Twoich danych i może działać w aplikacji
+            </div>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+              Kliknij przykład, aby wstawić go do pola, albo wpisz własne pytanie.
+            </p>
+            <div className="space-y-3">
+              {SUGGESTION_GROUPS.map(group => (
+                <div key={group.title}>
+                  <div className="text-[11px] font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-1.5">
+                    {group.title}
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {group.items.map(q => (
+                      <button
+                        key={q}
+                        type="button"
+                        onClick={() => applySuggestion(q)}
+                        className="text-left bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 hover:border-blue-400 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 text-gray-700 dark:text-gray-300 rounded-full px-3 py-1.5 text-xs transition-colors"
+                      >
+                        {q}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
@@ -340,6 +404,7 @@ export function ChatPage() {
 
       <form onSubmit={handleSend} className="flex gap-2 mt-4">
         <textarea
+          ref={textareaRef}
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={handleKeyDown}

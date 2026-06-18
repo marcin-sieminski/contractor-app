@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { createManualEntry } from '../../api/timeEntries'
 import { getProjects } from '../../api/clients'
+import { useClientNameById } from '../../hooks/useClientNameById'
+import { shortClientName } from '../../lib/clientName'
 import { format } from 'date-fns'
 
 interface Props { onClose: () => void }
@@ -9,6 +11,7 @@ interface Props { onClose: () => void }
 export function ManualEntryForm({ onClose }: Props) {
   const qc = useQueryClient()
   const { data: projects = [] } = useQuery({ queryKey: ['projects'], queryFn: () => getProjects() })
+  const clientNameById = useClientNameById()
   const today = format(new Date(), 'yyyy-MM-dd')
   const [form, setForm] = useState({ projectId: '', date: today, startTime: '09:00', endTime: '17:00', description: '' })
 
@@ -35,7 +38,14 @@ export function ManualEntryForm({ onClose }: Props) {
             className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
           >
             <option value="">Projekt...</option>
-            {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+            {projects.map(p => {
+              const client = clientNameById.get(p.clientId)
+              return (
+                <option key={p.id} value={p.id}>
+                  {client ? `${p.name} (${shortClientName(client)})` : p.name}
+                </option>
+              )
+            })}
           </select>
           <input type="date" value={form.date}
             onChange={e => setForm(f => ({ ...f, date: e.target.value }))}
