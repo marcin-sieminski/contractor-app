@@ -13,6 +13,14 @@ const queryClient = new QueryClient({
   }
 })
 
+// Rejestracja service workera (PWA) — tylko w produkcyjnym buildzie,
+// aby nie cache'ować zasobów podczas developmentu (HMR).
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {})
+  })
+}
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>

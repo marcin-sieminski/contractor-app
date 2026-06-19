@@ -1,0 +1,26 @@
+name: Frontend — testy responsywności
+
+on:
+  pull_request:
+    paths:
+      - 'mvp-1/frontend/**'
+  push:
+    branches: [main]
+    paths:
+      - 'mvp-1/frontend/**'
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mvp-1/frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      # npm install (nie ci) — lockfile może nie zawierać jeszcze @playwright/test.
+      - run: npm install
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
