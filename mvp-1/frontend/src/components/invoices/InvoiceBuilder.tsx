@@ -82,8 +82,8 @@ export function InvoiceBuilder({ onClose }: Props) {
     .reduce((acc, e) => acc + (e.durationMinutes ?? 0) / 60, 0)
 
   return (
-    <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-      <div role="dialog" aria-modal="true" aria-label="Kreator faktury" className="bg-white rounded-xl shadow-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-0 sm:p-4">
+      <div role="dialog" aria-modal="true" aria-label="Kreator faktury" className="bg-white shadow-xl p-6 w-full h-full sm:h-auto max-w-none sm:max-w-lg max-h-none sm:max-h-[90vh] rounded-none sm:rounded-xl overflow-y-auto">
         <div className="flex items-center gap-2 mb-6">
           {[1,2,3,4].map(s => (
             <div key={s} className={`w-2 h-2 rounded-full ${s <= step ? 'bg-blue-600' : 'bg-gray-200'}`} />

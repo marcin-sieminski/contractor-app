@@ -7,7 +7,7 @@ export function InvoicesPage() {
   const [showBuilder, setShowBuilder] = useState(false)
 
   return (
-    <div className="p-6">
+    <div className="p-4 md:p-6">
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Faktury</h1>
         <button onClick={() => setShowBuilder(true)}

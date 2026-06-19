@@ -26,8 +26,8 @@ export function InvoiceDetailModal({ invoiceId, onClose, onEdit }: Props) {
   })
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-      <div role="dialog" aria-modal="true" aria-labelledby={titleId} className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col">
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-0 sm:p-4">
+      <div role="dialog" aria-modal="true" aria-labelledby={titleId} className="bg-white dark:bg-gray-800 shadow-2xl w-full h-full sm:h-auto max-w-none sm:max-w-2xl max-h-none sm:max-h-[90vh] rounded-none sm:rounded-xl flex flex-col">
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-700">
           <div className="flex items-center gap-3">
             <h2 id={titleId} className="text-lg font-semibold text-gray-900 dark:text-gray-100">

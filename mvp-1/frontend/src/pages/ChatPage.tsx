@@ -278,7 +278,7 @@ export function ChatPage() {
         onNew={handleNewChat}
         onDelete={handleDeleteConversation}
       />
-      <div className="flex-1 p-6 flex flex-col min-w-0">
+      <div className="flex-1 p-4 md:p-6 flex flex-col min-w-0">
       <div className="mb-4 flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Asystent AI</h1>
@@ -446,7 +446,7 @@ function ConversationSidebar({ conversations, activeId, onSelect, onNew, onDelet
   onDelete: (id: string) => void
 }) {
   return (
-    <aside className="w-64 shrink-0 border-r border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex flex-col">
+    <aside className="hidden md:flex w-64 shrink-0 border-r border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex-col">
       <div className="p-3">
         <button
           onClick={onNew}
