@@ -1,10 +1,12 @@
-import { useState, FormEvent } from 'react'
+import { useState, useId, FormEvent } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 export function LoginPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
+  const emailId = useId()
+  const passwordId = useId()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -31,16 +33,18 @@ export function LoginPage() {
         <p className="text-gray-500 dark:text-gray-400 mb-8">Zaloguj się do swojego konta</p>
 
         {error && (
-          <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-400 text-sm">
+          <div role="alert" className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-400 text-sm">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Email</label>
+            <label htmlFor={emailId} className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Email</label>
             <input
+              id={emailId}
               type="email"
+              autoComplete="username"
               value={email}
               onChange={e => setEmail(e.target.value)}
               required
@@ -50,9 +54,11 @@ export function LoginPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Hasło</label>
+            <label htmlFor={passwordId} className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Hasło</label>
             <input
+              id={passwordId}
               type="password"
+              autoComplete="current-password"
               value={password}
               onChange={e => setPassword(e.target.value)}
               required

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useId } from 'react'
 import { Monitor, Moon, Sun, Contrast, Sparkles } from 'lucide-react'
 import { useTheme, type Theme } from '../context/ThemeContext'
 import { useAuth } from '../context/AuthContext'
@@ -27,6 +27,7 @@ export function SettingsPage() {
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const displayNameId = useId()
 
   async function handleSaveProfile(e: React.FormEvent) {
     e.preventDefault()
@@ -53,22 +54,24 @@ export function SettingsPage() {
         <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">Nazwa wyświetlana w pasku nawigacji zamiast adresu e-mail</p>
         <form onSubmit={handleSaveProfile} className="space-y-4">
           <div>
-            <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
+            <label htmlFor={displayNameId} className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
               Nazwa użytkownika
             </label>
             <input
+              id={displayNameId}
               type="text"
+              autoComplete="name"
               value={displayName}
               onChange={e => setDisplayName(e.target.value)}
               placeholder={user?.email ?? ''}
               maxLength={80}
               className="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
+            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
               Zostaw puste, aby wyświetlać adres e-mail
             </p>
           </div>
-          {error && <p className="text-xs text-red-500">{error}</p>}
+          {error && <p role="alert" className="text-xs text-red-500">{error}</p>}
           <button
             type="submit"
             disabled={saving}
@@ -103,7 +106,7 @@ export function SettingsPage() {
                 <span className={`text-sm font-medium ${isActive ? 'text-blue-700 dark:text-blue-400' : 'text-gray-700 dark:text-gray-200'}`}>
                   {opt.label}
                 </span>
-                <span className={`text-xs text-center leading-tight ${isActive ? 'text-blue-600/80 dark:text-blue-400/80' : 'text-gray-400 dark:text-gray-500'}`}>
+                <span className={`text-xs text-center leading-tight ${isActive ? 'text-blue-600/80 dark:text-blue-400/80' : 'text-gray-500 dark:text-gray-400'}`}>
                   {opt.description}
                 </span>
               </button>

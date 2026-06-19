@@ -40,24 +40,26 @@ export function InvoiceList() {
             </div>
             <div className="text-right">
               <div className="font-semibold text-sm text-gray-900 dark:text-gray-100">{inv.totalGross.toFixed(2)} {inv.currency}</div>
-              <div className="text-gray-400 dark:text-gray-500 text-xs">netto: {inv.totalNet.toFixed(2)}</div>
+              <div className="text-gray-500 dark:text-gray-400 text-xs">netto: {inv.totalNet.toFixed(2)}</div>
             </div>
             <div className="flex items-center gap-1 ml-2">
               <button
                 onClick={() => setDetailId(inv.id)}
+                aria-label="Szczegóły faktury"
                 title="Szczegóły faktury"
-                className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-200 p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
               >
-                <Eye size={14} />
+                <Eye size={14} aria-hidden="true" />
               </button>
               {inv.status === 'Draft' && (
                 <>
                   <button
                     onClick={() => setEditId(inv.id)}
+                    aria-label="Edytuj fakturę"
                     title="Edytuj fakturę"
-                    className="text-gray-400 hover:text-blue-600 p-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30"
+                    className="text-gray-500 hover:text-blue-600 p-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/30"
                   >
-                    <Pencil size={14} />
+                    <Pencil size={14} aria-hidden="true" />
                   </button>
                   <button
                     onClick={() => submitMutation.mutate(inv.id)}
@@ -65,7 +67,7 @@ export function InvoiceList() {
                     title="Wyślij do KSeF"
                     className="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs flex items-center gap-1 hover:bg-blue-700 disabled:opacity-50"
                   >
-                    <Send size={12} /> KSeF
+                    <Send size={12} aria-hidden="true" /> KSeF
                   </button>
                 </>
               )}

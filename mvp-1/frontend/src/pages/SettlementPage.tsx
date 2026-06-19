@@ -168,10 +168,10 @@ export function SettlementPage() {
       </div>
 
       {isLoading && !data && (
-        <div className="text-gray-400 dark:text-gray-500 text-sm py-12 text-center">Ładowanie…</div>
+        <div className="text-gray-500 dark:text-gray-400 text-sm py-12 text-center">Ładowanie…</div>
       )}
       {isError && (
-        <div className="text-red-500 text-sm py-12 text-center">Nie udało się pobrać rozliczenia.</div>
+        <div role="alert" className="text-red-500 text-sm py-12 text-center">Nie udało się pobrać rozliczenia.</div>
       )}
 
       {data && adjustments && taxpayer && (
@@ -197,7 +197,7 @@ export function SettlementPage() {
           {taxForm !== 'ryczalt' && (
             <section className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
               <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">IP Box (5%)</h2>
-              <p className="text-xs text-gray-400 dark:text-gray-500 mb-3">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
                 Wymaga odrębnej ewidencji IP i załącznika PIT/IP. Solo-kontraktor bez zakupu praw IP → Nexus zwykle 1,0.
               </p>
               <div className="flex flex-wrap items-end gap-4">
@@ -287,7 +287,7 @@ export function SettlementPage() {
             </button>
           </div>
 
-          <p className="text-xs text-gray-400 dark:text-gray-500">
+          <p className="text-xs text-gray-500 dark:text-gray-400">
             Plik XML wgrasz w oficjalnym eFormularzu Ministerstwa Finansów
             (klient-eformularz.mf.gov.pl) i tam autoryzujesz wysyłkę. Zalecamy zatwierdzenie
             rozliczenia przed wysyłką.

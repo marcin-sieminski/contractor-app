@@ -1,4 +1,5 @@
 using System.Net.Http.Json;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -66,5 +67,50 @@ public class OllamaService
             ?? throw new InvalidOperationException("Ollama returned empty response body.");
 
         return result;
+    }
+
+    /// <summary>
+    /// Strumieniuje odpowiedź modelu (stream:true, NDJSON) — yielduje kolejne fragmenty treści.
+    /// Bez narzędzi: przeznaczone do strumieniowania finalnej odpowiedzi po rozwiązaniu narzędzi.
+    /// </summary>
+    public async IAsyncEnumerable<string> StreamChatAsync(
+        IReadOnlyList<OllamaMessage> messages,
+        [EnumeratorCancellation] CancellationToken ct,
+        string? modelOverride = null)
+    {
+        var req = new OllamaChatRequest
+        {
+            Model = !string.IsNullOrWhiteSpace(modelOverride) ? modelOverride : _opts.Model,
+            Messages = messages.ToList(),
+            Tools = null,
+            Stream = true,
+            Options = new OllamaRequestOptions { Temperature = _opts.Temperature },
+            KeepAlive = string.IsNullOrWhiteSpace(_opts.KeepAlive) ? null : _opts.KeepAlive
+        };
+
+        using var request = new HttpRequestMessage(HttpMethod.Post, "/api/chat")
+        {
+            Content = JsonContent.Create(req, options: JsonOpts)
+        };
+        using var response = await _http.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, ct);
+        response.EnsureSuccessStatusCode();
+
+        await using var stream = await response.Content.ReadAsStreamAsync(ct);
+        using var reader = new StreamReader(stream);
+
+        string? line;
+        while ((line = await reader.ReadLineAsync(ct)) is not null)
+        {
+            ct.ThrowIfCancellationRequested();
+            if (string.IsNullOrWhiteSpace(line)) continue;
+
+            OllamaChatResponse? chunk;
+            try { chunk = JsonSerializer.Deserialize<OllamaChatResponse>(line, JsonOpts); }
+            catch { continue; }
+
+            var content = chunk?.Message?.Content;
+            if (!string.IsNullOrEmpty(content)) yield return content;
+            if (chunk?.Done == true) break;
+        }
     }
 }

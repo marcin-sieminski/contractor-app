@@ -1,8 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 import { getInvoiceById, getInvoiceXml } from '../../api/invoices'
 import { InvoiceStatusBadge } from './InvoiceStatusBadge'
+import { useDialogClose } from '../../hooks/useDialogClose'
 import { X, Copy } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useId } from 'react'
 
 interface Props {
   invoiceId: string
@@ -11,6 +12,8 @@ interface Props {
 }
 
 export function InvoiceDetailModal({ invoiceId, onClose, onEdit }: Props) {
+  const titleId = useId()
+  useDialogClose(onClose)
   const { data: invoice, isLoading } = useQuery({
     queryKey: ['invoice', invoiceId],
     queryFn: () => getInvoiceById(invoiceId)
@@ -23,11 +26,11 @@ export function InvoiceDetailModal({ invoiceId, onClose, onEdit }: Props) {
   })
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col">
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-0 sm:p-4">
+      <div role="dialog" aria-modal="true" aria-labelledby={titleId} className="bg-white dark:bg-gray-800 shadow-2xl w-full h-full sm:h-auto max-w-none sm:max-w-2xl max-h-none sm:max-h-[90vh] rounded-none sm:rounded-xl flex flex-col">
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-gray-700">
           <div className="flex items-center gap-3">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+            <h2 id={titleId} className="text-lg font-semibold text-gray-900 dark:text-gray-100">
               {isLoading ? 'Ładowanie...' : invoice?.invoiceNumber}
             </h2>
             {invoice && <InvoiceStatusBadge status={invoice.status} />}
@@ -41,24 +44,24 @@ export function InvoiceDetailModal({ invoiceId, onClose, onEdit }: Props) {
                 Edytuj
               </button>
             )}
-            <button onClick={onClose} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1">
-              <X size={20} />
+            <button onClick={onClose} aria-label="Zamknij" className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 p-1">
+              <X size={20} aria-hidden="true" />
             </button>
           </div>
         </div>
 
         <div className="overflow-y-auto flex-1 px-6 py-4 space-y-5">
-          {isLoading && <div className="text-gray-400 dark:text-gray-500 text-sm text-center py-8">Ładowanie...</div>}
+          {isLoading && <div className="text-gray-500 dark:text-gray-400 text-sm text-center py-8">Ładowanie...</div>}
           {invoice && (
             <>
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
-                  <div className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-1">Nabywca</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Nabywca</div>
                   <div className="font-medium text-sm text-gray-900 dark:text-gray-100">{invoice.clientName}</div>
                   <div className="text-xs text-gray-500 dark:text-gray-400">NIP: {invoice.clientNip}</div>
                 </div>
                 <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-3">
-                  <div className="text-xs text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-1">Daty</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">Daty</div>
                   <div className="text-xs text-gray-600 dark:text-gray-300 space-y-0.5">
                     <div>Wystawienia: <span className="font-medium">{invoice.issueDate}</span></div>
                     <div>Sprzedaży: <span className="font-medium">{invoice.serviceDate}</span></div>
@@ -85,7 +88,7 @@ export function InvoiceDetailModal({ invoiceId, onClose, onEdit }: Props) {
                 <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">Pozycje</div>
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="text-xs text-gray-400 dark:text-gray-500 border-b border-gray-100 dark:border-gray-700">
+                    <tr className="text-xs text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-700">
                       <th className="text-left pb-1 font-medium">Opis</th>
                       <th className="text-right pb-1 font-medium w-16">Ilość</th>
                       <th className="text-right pb-1 font-medium w-20">Cena/j.</th>
@@ -135,9 +138,10 @@ export function InvoiceDetailModal({ invoiceId, onClose, onEdit }: Props) {
                       <button
                         onClick={() => navigator.clipboard.writeText(invoice.ksefReferenceNumber!)}
                         className="text-green-600 dark:text-green-400 hover:text-green-800 flex-shrink-0"
+                        aria-label="Kopiuj numer KSeF"
                         title="Kopiuj"
                       >
-                        <Copy size={12} />
+                        <Copy size={12} aria-hidden="true" />
                       </button>
                     </div>
                   )}
@@ -155,7 +159,7 @@ export function InvoiceDetailModal({ invoiceId, onClose, onEdit }: Props) {
               <div>
                 <button
                   onClick={() => setShowXml(v => !v)}
-                  className="text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 underline"
+                  className="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 underline"
                 >
                   {showXml ? 'Ukryj XML FA(3)' : 'Pokaż XML FA(3)'}
                 </button>

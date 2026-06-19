@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useId } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { getClients } from '../../api/clients'
 import { getTimeEntries } from '../../api/timeEntries'
 import { generateInvoice, submitToKsef } from '../../api/invoices'
+import { useDialogClose } from '../../hooks/useDialogClose'
 import { format } from 'date-fns'
 
 interface Props { onClose: () => void }
@@ -21,6 +22,8 @@ const CURRENCIES = [
 ]
 
 export function InvoiceBuilder({ onClose }: Props) {
+  const fieldId = useId()
+  useDialogClose(onClose)
   const qc = useQueryClient()
   const [step, setStep] = useState(1)
   const [clientId, setClientId] = useState('')
@@ -79,8 +82,8 @@ export function InvoiceBuilder({ onClose }: Props) {
     .reduce((acc, e) => acc + (e.durationMinutes ?? 0) / 60, 0)
 
   return (
-    <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50 p-0 sm:p-4">
+      <div role="dialog" aria-modal="true" aria-label="Kreator faktury" className="bg-white shadow-xl p-6 w-full h-full sm:h-auto max-w-none sm:max-w-lg max-h-none sm:max-h-[90vh] rounded-none sm:rounded-xl overflow-y-auto">
         <div className="flex items-center gap-2 mb-6">
           {[1,2,3,4].map(s => (
             <div key={s} className={`w-2 h-2 rounded-full ${s <= step ? 'bg-blue-600' : 'bg-gray-200'}`} />
@@ -107,7 +110,7 @@ export function InvoiceBuilder({ onClose }: Props) {
           <div>
             <h2 className="text-lg font-semibold mb-4">Wybierz wpisy czasu</h2>
             {entries.length === 0
-              ? <div className="text-gray-400 text-sm text-center py-8">Brak niezafakturowanych wpisów dla tego klienta.</div>
+              ? <div className="text-gray-500 text-sm text-center py-8">Brak niezafakturowanych wpisów dla tego klienta.</div>
               : <div className="space-y-1">
                   {entries.map(e => (
                     <label key={e.id} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 cursor-pointer">
@@ -134,20 +137,20 @@ export function InvoiceBuilder({ onClose }: Props) {
             <h2 className="text-lg font-semibold mb-4">Opcje faktury</h2>
             <div className="space-y-4">
               <div>
-                <label className="text-xs text-gray-500 mb-1 block">Data wystawienia</label>
-                <input type="date" value={issueDate} onChange={e => setIssueDate(e.target.value)}
+                <label htmlFor={`${fieldId}-issue`} className="text-xs text-gray-500 mb-1 block">Data wystawienia</label>
+                <input id={`${fieldId}-issue`} type="date" value={issueDate} onChange={e => setIssueDate(e.target.value)}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
               </div>
               <div>
-                <label className="text-xs text-gray-500 mb-1 block">Traktowanie VAT</label>
-                <select value={vatTreatment} onChange={e => setVatTreatment(Number(e.target.value))}
+                <label htmlFor={`${fieldId}-vat`} className="text-xs text-gray-500 mb-1 block">Traktowanie VAT</label>
+                <select id={`${fieldId}-vat`} value={vatTreatment} onChange={e => setVatTreatment(Number(e.target.value))}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
                   {VAT_TREATMENT.map(v => <option key={v.value} value={v.value}>{v.label}</option>)}
                 </select>
               </div>
               <div>
-                <label className="text-xs text-gray-500 mb-1 block">Waluta</label>
-                <select value={currency} onChange={e => setCurrency(Number(e.target.value))}
+                <label htmlFor={`${fieldId}-currency`} className="text-xs text-gray-500 mb-1 block">Waluta</label>
+                <select id={`${fieldId}-currency`} value={currency} onChange={e => setCurrency(Number(e.target.value))}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
                   {CURRENCIES.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
                 </select>
@@ -174,10 +177,10 @@ export function InvoiceBuilder({ onClose }: Props) {
               {submitMutation.isPending ? 'Wysyłanie...' : '📤 Wyślij do KSeF'}
             </button>
             {submitMutation.isSuccess && (
-              <div className="text-green-600 text-sm">✓ Wysłano do KSeF pomyślnie!</div>
+              <div role="status" className="text-green-600 text-sm">✓ Wysłano do KSeF pomyślnie!</div>
             )}
             {submitMutation.isError && (
-              <div className="text-red-500 text-sm">Błąd KSeF – sprawdź szczegóły na liście faktur.</div>
+              <div role="alert" className="text-red-500 text-sm">Błąd KSeF – sprawdź szczegóły na liście faktur.</div>
             )}
           </div>
         )}

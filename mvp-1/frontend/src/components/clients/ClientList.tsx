@@ -32,6 +32,7 @@ function AddProjectInline({ clientId, onDone }: { clientId: string; onDone: () =
     >
       <input
         autoFocus
+        aria-label="Nazwa projektu"
         placeholder="Nazwa projektu"
         value={form.name}
         onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
@@ -39,6 +40,7 @@ function AddProjectInline({ clientId, onDone }: { clientId: string; onDone: () =
       />
       <input
         type="number"
+        aria-label="Stawka godzinowa"
         placeholder="Stawka/h"
         value={form.hourlyRate}
         onChange={e => setForm(f => ({ ...f, hourlyRate: e.target.value }))}
@@ -47,6 +49,7 @@ function AddProjectInline({ clientId, onDone }: { clientId: string; onDone: () =
         step="0.01"
       />
       <select
+        aria-label="Waluta"
         value={form.currency}
         onChange={e => setForm(f => ({ ...f, currency: e.target.value }))}
         className="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 text-xs bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-400 outline-none"
@@ -60,8 +63,8 @@ function AddProjectInline({ clientId, onDone }: { clientId: string; onDone: () =
       >
         {mutation.isPending ? '...' : 'Dodaj'}
       </button>
-      <button type="button" onClick={onDone} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
-        <X size={14} />
+      <button type="button" onClick={onDone} aria-label="Anuluj" className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+        <X size={14} aria-hidden="true" />
       </button>
     </form>
   )
@@ -74,7 +77,7 @@ export function ClientList() {
 
   if (isLoading) return <div className="text-gray-500 dark:text-gray-400 p-4 text-sm">Ładowanie...</div>
   if (clients.length === 0)
-    return <div className="text-gray-400 dark:text-gray-500 text-sm p-4 text-center">Brak klientów. Dodaj pierwszego klienta.</div>
+    return <div className="text-gray-500 dark:text-gray-400 text-sm p-4 text-center">Brak klientów. Dodaj pierwszego klienta.</div>
 
   return (
     <div className="divide-y divide-gray-100 dark:divide-gray-700">
@@ -82,16 +85,17 @@ export function ClientList() {
         <div key={c.id} className="group px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700/50">
           <div className="flex items-center gap-2">
             <span className="font-medium text-gray-900 dark:text-gray-100">{c.name}</span>
-            {c.isVerified && <CheckCircle size={14} className="text-green-500" />}
+            {c.isVerified && <CheckCircle size={14} className="text-green-500" role="img" aria-label="Zweryfikowany" />}
             {c.isEuVatPayer && (
               <span className="bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 text-xs px-2 py-0.5 rounded-full">VAT UE</span>
             )}
             <button
               onClick={() => setEditingClient(c)}
+              aria-label="Edytuj klienta"
               title="Edytuj klienta"
-              className="ml-auto text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity"
+              className="ml-auto text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
             >
-              <Pencil size={14} />
+              <Pencil size={14} aria-hidden="true" />
             </button>
           </div>
           <div className="text-gray-500 dark:text-gray-400 text-xs mt-0.5">NIP: {c.nip} · {c.city}</div>
@@ -107,7 +111,7 @@ export function ClientList() {
                 onClick={() => setAddingProjectFor(c.id)}
                 className="flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 px-1.5 py-0.5 rounded hover:bg-blue-50 dark:hover:bg-blue-900/20"
               >
-                <Plus size={12} /> projekt
+                <Plus size={12} aria-hidden="true" /> projekt
               </button>
             )}
           </div>

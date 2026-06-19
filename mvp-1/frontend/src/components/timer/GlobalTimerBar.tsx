@@ -33,28 +33,31 @@ export function GlobalTimerBar() {
           <button
             onClick={e => { e.stopPropagation(); pause() }}
             disabled={isPausing}
+            aria-label="Wstrzymaj"
             title="Wstrzymaj"
-            className={`p-1.5 rounded hover:bg-blue-500 disabled:opacity-50 transition-colors`}
+            className={`flex items-center justify-center h-11 w-11 rounded hover:bg-blue-500 disabled:opacity-50 transition-colors`}
           >
-            <Pause size={14} />
+            <Pause size={14} aria-hidden="true" />
           </button>
         ) : (
           <button
             onClick={e => { e.stopPropagation(); resume() }}
             disabled={isResuming}
+            aria-label="Wznów"
             title="Wznów"
-            className="p-1.5 rounded hover:bg-amber-600 disabled:opacity-50 transition-colors"
+            className="flex items-center justify-center h-11 w-11 rounded hover:bg-amber-600 disabled:opacity-50 transition-colors"
           >
-            <Play size={14} />
+            <Play size={14} aria-hidden="true" />
           </button>
         )}
         <button
           onClick={e => { e.stopPropagation(); stop() }}
           disabled={isStopping}
+          aria-label="Zatrzymaj i zapisz"
           title="Zatrzymaj i zapisz"
-          className={`p-1.5 rounded disabled:opacity-50 transition-colors ${isActive ? 'hover:bg-blue-500' : 'hover:bg-amber-600'}`}
+          className={`flex items-center justify-center h-11 w-11 rounded disabled:opacity-50 transition-colors ${isActive ? 'hover:bg-blue-500' : 'hover:bg-amber-600'}`}
         >
-          <Square size={14} />
+          <Square size={14} aria-hidden="true" />
         </button>
       </div>
     </div>

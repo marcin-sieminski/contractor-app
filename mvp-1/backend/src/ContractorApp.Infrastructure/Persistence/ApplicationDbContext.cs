@@ -21,6 +21,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IApplica
     public DbSet<ForecastOverride> ForecastOverrides => Set<ForecastOverride>();
     public DbSet<AnnualSettlement> AnnualSettlements => Set<AnnualSettlement>();
     public DbSet<TaxPayment> TaxPayments => Set<TaxPayment>();
+    public DbSet<Conversation> Conversations => Set<Conversation>();
+    public DbSet<ConversationMessage> ConversationMessages => Set<ConversationMessage>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

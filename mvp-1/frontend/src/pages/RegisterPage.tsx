@@ -1,10 +1,13 @@
-import { useState, FormEvent } from 'react'
+import { useState, useId, FormEvent } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
 export function RegisterPage() {
   const { register } = useAuth()
   const navigate = useNavigate()
+  const emailId = useId()
+  const passwordId = useId()
+  const confirmId = useId()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -41,16 +44,18 @@ export function RegisterPage() {
         <p className="text-gray-500 dark:text-gray-400 mb-8">Utwórz nowe konto</p>
 
         {errors.length > 0 && (
-          <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-400 text-sm space-y-1">
+          <div role="alert" className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-400 text-sm space-y-1">
             {errors.map((e, i) => <p key={i}>{e}</p>)}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Email</label>
+            <label htmlFor={emailId} className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Email</label>
             <input
+              id={emailId}
               type="email"
+              autoComplete="username"
               value={email}
               onChange={e => setEmail(e.target.value)}
               required
@@ -60,11 +65,13 @@ export function RegisterPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
-              Hasło <span className="text-gray-400 dark:text-gray-500 font-normal">(min. 8 znaków)</span>
+            <label htmlFor={passwordId} className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+              Hasło <span className="text-gray-500 dark:text-gray-400 font-normal">(min. 8 znaków)</span>
             </label>
             <input
+              id={passwordId}
               type="password"
+              autoComplete="new-password"
               value={password}
               onChange={e => setPassword(e.target.value)}
               required
@@ -75,9 +82,11 @@ export function RegisterPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Powtórz hasło</label>
+            <label htmlFor={confirmId} className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Powtórz hasło</label>
             <input
+              id={confirmId}
               type="password"
+              autoComplete="new-password"
               value={confirmPassword}
               onChange={e => setConfirmPassword(e.target.value)}
               required

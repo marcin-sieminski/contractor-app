@@ -21,7 +21,7 @@ const STATUS_COLOR: Record<string, string> = {
   tight: 'text-amber-600 dark:text-amber-400',
   danger: 'text-red-600 dark:text-red-400',
   overdue: 'text-red-700 dark:text-red-300',
-  paid: 'text-gray-400 dark:text-gray-500',
+  paid: 'text-gray-500 dark:text-gray-400',
 }
 
 const STATUS_BG: Record<string, string> = {
@@ -88,7 +88,7 @@ function EventRow({ event }: { event: CashFlowEvent }) {
   return (
     <div className={`flex items-center justify-between px-4 py-3 border rounded-lg text-sm ${STATUS_BG[event.status]}`}>
       <div className="flex items-center gap-3 min-w-0">
-        <span className="text-xs font-mono text-gray-400 dark:text-gray-500 w-20 flex-shrink-0">
+        <span className="text-xs font-mono text-gray-500 dark:text-gray-400 w-20 flex-shrink-0">
           {event.date.slice(5).replace('-', '.')}
         </span>
         <span className={`flex-shrink-0 text-xs font-medium px-1.5 py-0.5 rounded ${
@@ -161,16 +161,17 @@ export function CashFlowPage() {
 
         {/* Parametry */}
         <div className="flex flex-wrap items-center gap-3">
-          <select value={taxForm} onChange={e => setTaxForm(e.target.value as TaxFormKey)} className={selectCls}>
+          <select aria-label="Forma opodatkowania" value={taxForm} onChange={e => setTaxForm(e.target.value as TaxFormKey)} className={selectCls}>
             {TAX_FORMS.map(f => <option key={f} value={f}>{TAX_FORM_LABELS[f]}</option>)}
           </select>
-          <select value={zusStage} onChange={e => setZusStage(e.target.value as ZusStageKey)} className={selectCls}>
+          <select aria-label="Etap ZUS" value={zusStage} onChange={e => setZusStage(e.target.value as ZusStageKey)} className={selectCls}>
             {ZUS_STAGES.map(s => <option key={s} value={s}>{ZUS_STAGE_LABELS[s]}</option>)}
           </select>
           <div className="flex items-center gap-2">
             <label className="text-sm text-gray-600 dark:text-gray-300 whitespace-nowrap">Saldo konta:</label>
             <input
               type="number"
+              aria-label="Saldo konta (PLN)"
               value={inputBalance}
               onChange={e => setInputBalance(e.target.value)}
               onBlur={() => setStartingBalance(Number(inputBalance) || 0)}
@@ -183,8 +184,8 @@ export function CashFlowPage() {
         </div>
       </div>
 
-      {isLoading && <div className="text-center py-16 text-gray-400 dark:text-gray-500">Ładowanie prognozy…</div>}
-      {isError && <div className="text-center py-16 text-red-500">Błąd ładowania danych.</div>}
+      {isLoading && <div className="text-center py-16 text-gray-500 dark:text-gray-400">Ładowanie prognozy…</div>}
+      {isError && <div role="alert" className="text-center py-16 text-red-500">Błąd ładowania danych.</div>}
 
       {data && (
         <>
@@ -238,7 +239,7 @@ export function CashFlowPage() {
               <div key={label} className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
                 <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{label}</div>
                 <div className={`text-xl font-bold ${color ?? 'text-gray-900 dark:text-gray-100'}`}>{value}</div>
-                <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">{sub}</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{sub}</div>
               </div>
             ))}
           </div>
@@ -279,7 +280,7 @@ export function CashFlowPage() {
             <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
               Prognoza salda przez 90 dni
             </h2>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mb-4">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
               Pionowe linie = terminy płatności (zielone/żółte/czerwone wg ryzyka). Wpływy z faktur co {Math.round(data.avgDsodays)} dni.
             </p>
             <ResponsiveContainer width="100%" height={240}>
@@ -319,7 +320,7 @@ export function CashFlowPage() {
               <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                 Nadchodzące zdarzenia
               </h2>
-              <div className="flex gap-3 text-xs text-gray-400 dark:text-gray-500">
+              <div className="flex gap-3 text-xs text-gray-500 dark:text-gray-400">
                 <span className="flex items-center gap-1">
                   <span className="w-2 h-2 rounded-full bg-emerald-500" /> OK
                 </span>
@@ -333,7 +334,7 @@ export function CashFlowPage() {
             </div>
             <div className="divide-y divide-gray-50 dark:divide-gray-800">
               {data.events.length === 0 ? (
-                <div className="px-4 py-8 text-center text-sm text-gray-400 dark:text-gray-500">
+                <div className="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
                   Brak zdarzeń w ciągu najbliższych 90 dni.
                 </div>
               ) : (
@@ -348,7 +349,7 @@ export function CashFlowPage() {
                       <div className="pt-2 pb-1">
                         <div className="flex items-center gap-2">
                           <CheckCircle size={14} className="text-gray-400" />
-                          <span className="text-xs text-gray-400 dark:text-gray-500 font-medium">Już zapłacone</span>
+                          <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">Już zapłacone</span>
                         </div>
                       </div>
                       {data.events

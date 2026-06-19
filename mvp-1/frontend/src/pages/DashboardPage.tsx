@@ -102,7 +102,7 @@ export function DashboardPage() {
 
   return (
     <>
-    <div className="p-6">
+    <div className="p-4 md:p-6">
       <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">Dashboard</h1>
 
       <div className="mb-6">
@@ -110,7 +110,7 @@ export function DashboardPage() {
       </div>
 
       {/* KPI cards */}
-      <div className="grid grid-cols-5 gap-4 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
           <div className="text-gray-500 dark:text-gray-400 text-sm mb-1">Godziny (ten miesiąc)</div>
           <div className="text-2xl font-bold text-blue-600">{(thisMonthMinutes / 60).toFixed(1)}h</div>
@@ -188,7 +188,7 @@ export function DashboardPage() {
       </div>
 
       {/* Wykresy */}
-      <div className="grid grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
         <RevenueByMonthChart
           data={activePoints}
           selectedMonth={selectedMonth}
@@ -205,7 +205,7 @@ export function DashboardPage() {
       <div className="flex items-center justify-between mb-3">
         <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">Wydatki</span>
       </div>
-      <div className="grid grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
         <ExpensesByMonthChart
           data={expenses}
           selectedMonth={selectedExpenseMonth}
