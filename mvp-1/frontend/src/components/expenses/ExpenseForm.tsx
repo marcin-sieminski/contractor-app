@@ -1,7 +1,8 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, useId } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Sparkles, Cpu, ScanLine, Loader2, Paperclip, FileText } from 'lucide-react'
 import { createExpense, updateExpense, scanReceipt } from '../../api/expenses'
+import { useDialogClose } from '../../hooks/useDialogClose'
 import { EXPENSE_CATEGORY_LABELS } from '../../types/expense'
 import type { Expense, ExpenseCategory, OcrProvider, ReceiptExtraction } from '../../types/expense'
 import { format } from 'date-fns'
@@ -32,6 +33,8 @@ interface FormState {
 const inputCls = "border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
 
 export function ExpenseForm({ expense, onClose }: Props) {
+  const titleId = useId()
+  useDialogClose(onClose)
   const qc = useQueryClient()
   const isEdit = !!expense
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -134,14 +137,14 @@ export function ExpenseForm({ expense, onClose }: Props) {
           : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
       }`}
     >
-      <Icon size={13} /> {label}
+      <Icon size={13} aria-hidden="true" /> {label}
     </button>
   )
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
-        <h2 className="text-lg font-semibold px-6 pt-5 pb-4 text-gray-900 dark:text-gray-100">
+      <div role="dialog" aria-modal="true" aria-labelledby={titleId} className="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+        <h2 id={titleId} className="text-lg font-semibold px-6 pt-5 pb-4 text-gray-900 dark:text-gray-100">
           {isEdit ? 'Edytuj wydatek' : 'Dodaj wydatek'}
         </h2>
 
@@ -159,6 +162,7 @@ export function ExpenseForm({ expense, onClose }: Props) {
             <input
               ref={fileInputRef}
               type="file"
+              aria-label="Plik paragonu lub faktury"
               accept="image/jpeg,image/png,image/webp,application/pdf"
               onChange={onFile}
               className="hidden"
@@ -172,8 +176,8 @@ export function ExpenseForm({ expense, onClose }: Props) {
                 className="flex items-center gap-2 px-3 py-2 text-sm bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 disabled:opacity-50 text-gray-700 dark:text-gray-200"
               >
                 {scanMutation.isPending
-                  ? <><Loader2 size={15} className="animate-spin" /> Rozpoznaję…</>
-                  : <><ScanLine size={15} /> Skanuj paragon/fakturę</>}
+                  ? <><Loader2 size={15} className="animate-spin" aria-hidden="true" /> Rozpoznaję…</>
+                  : <><ScanLine size={15} aria-hidden="true" /> Skanuj paragon/fakturę</>}
               </button>
 
               {previewUrl && !previewIsPdf && (
@@ -181,33 +185,35 @@ export function ExpenseForm({ expense, onClose }: Props) {
               )}
               {previewUrl && previewIsPdf && (
                 <span className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600 rounded px-2 py-1.5">
-                  <FileText size={14} className="text-red-500" /> PDF
+                  <FileText size={14} className="text-red-500" aria-hidden="true" /> PDF
                 </span>
               )}
               {!previewUrl && receiptId && (
-                <span className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400"><Paperclip size={12} /> skan</span>
+                <span className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400"><Paperclip size={12} aria-hidden="true" /> skan</span>
               )}
             </div>
 
             {scanMutation.isError && (
-              <p className="text-red-600 dark:text-red-400 text-xs mt-2">
+              <p role="alert" className="text-red-600 dark:text-red-400 text-xs mt-2">
                 {((scanMutation.error as { response?: { data?: { message?: string } } })?.response?.data?.message)
                   ?? 'Nie udało się rozpoznać dokumentu. Uzupełnij dane ręcznie.'}
               </p>
             )}
             {scanMutation.isSuccess && (
-              <p className="text-green-600 dark:text-green-400 text-xs mt-2">Rozpoznano — sprawdź i popraw dane przed zapisem.</p>
+              <p role="status" className="text-green-600 dark:text-green-400 text-xs mt-2">Rozpoznano — sprawdź i popraw dane przed zapisem.</p>
             )}
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <input
               type="date"
+              aria-label="Data"
               value={form.date}
               onChange={e => set('date', e.target.value)}
               className={inputCls}
             />
             <select
+              aria-label="Kategoria"
               value={form.category}
               onChange={e => { set('category', e.target.value as ExpenseCategory); setLowConfidence(false) }}
               className={inputCls + (lowConfidence ? ' ring-2 ring-amber-400' : '')}
@@ -221,6 +227,7 @@ export function ExpenseForm({ expense, onClose }: Props) {
 
           <input
             type="text"
+            aria-label="Opis"
             placeholder="Opis *"
             value={form.description}
             onChange={e => set('description', e.target.value)}
@@ -230,6 +237,7 @@ export function ExpenseForm({ expense, onClose }: Props) {
           <div className="grid grid-cols-2 gap-3">
             <input
               type="text"
+              aria-label="Sprzedawca"
               placeholder="Sprzedawca"
               value={form.vendorName}
               onChange={e => set('vendorName', e.target.value)}
@@ -237,6 +245,7 @@ export function ExpenseForm({ expense, onClose }: Props) {
             />
             <input
               type="text"
+              aria-label="NIP sprzedawcy"
               placeholder="NIP sprzedawcy"
               value={form.vendorNip}
               onChange={e => set('vendorNip', e.target.value)}
@@ -247,6 +256,7 @@ export function ExpenseForm({ expense, onClose }: Props) {
           <div className="grid grid-cols-2 gap-3">
             <input
               type="number"
+              aria-label="Kwota brutto"
               placeholder="Kwota brutto *"
               min="0"
               step="0.01"
@@ -255,6 +265,7 @@ export function ExpenseForm({ expense, onClose }: Props) {
               className={inputCls}
             />
             <select
+              aria-label="Waluta"
               value={form.currency}
               onChange={e => set('currency', e.target.value)}
               className={inputCls}
@@ -266,6 +277,7 @@ export function ExpenseForm({ expense, onClose }: Props) {
           <div className="grid grid-cols-2 gap-3">
             <input
               type="number"
+              aria-label="Kwota netto"
               placeholder="Netto"
               min="0"
               step="0.01"
@@ -275,6 +287,7 @@ export function ExpenseForm({ expense, onClose }: Props) {
             />
             <input
               type="number"
+              aria-label="Kwota VAT"
               placeholder="VAT"
               min="0"
               step="0.01"
@@ -287,6 +300,7 @@ export function ExpenseForm({ expense, onClose }: Props) {
           {form.currency !== 'PLN' && (
             <input
               type="number"
+              aria-label={`Kurs ${form.currency}/PLN`}
               placeholder={`Kurs ${form.currency}/PLN *`}
               min="0"
               step="0.0001"
@@ -298,6 +312,7 @@ export function ExpenseForm({ expense, onClose }: Props) {
 
           <input
             type="text"
+            aria-label="Nr faktury lub paragonu"
             placeholder="Nr faktury / paragonu (opcjonalnie)"
             value={form.receiptNumber}
             onChange={e => set('receiptNumber', e.target.value)}
@@ -315,7 +330,7 @@ export function ExpenseForm({ expense, onClose }: Props) {
           </label>
 
           {mutation.isError && (
-            <p className="text-red-600 dark:text-red-400 text-xs">{(mutation.error as Error)?.message ?? 'Błąd zapisu.'}</p>
+            <p role="alert" className="text-red-600 dark:text-red-400 text-xs">{(mutation.error as Error)?.message ?? 'Błąd zapisu.'}</p>
           )}
         </div>
 

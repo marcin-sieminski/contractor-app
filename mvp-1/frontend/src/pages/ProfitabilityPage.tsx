@@ -54,7 +54,7 @@ function ClientRow({ client, color, minRate }: { client: ClientProfitability; co
               open ? <ChevronDown size={14} className="text-gray-400" /> : <ChevronRight size={14} className="text-gray-400" />
             )}
           </div>
-          <div className="text-xs text-gray-400 dark:text-gray-500 ml-5">{client.clientNip}</div>
+          <div className="text-xs text-gray-500 dark:text-gray-400 ml-5">{client.clientNip}</div>
         </td>
         <td className="px-4 py-3 text-right text-sm text-gray-900 dark:text-gray-100">{fmt(client.revenuePln)}</td>
         <td className="px-4 py-3 text-right text-sm text-gray-600 dark:text-gray-300">{fmtH(client.billableHours)}</td>
@@ -63,7 +63,7 @@ function ClientRow({ client, color, minRate }: { client: ClientProfitability; co
             {fmtRate(client.effectiveRatePlnPerHour)}
           </span>
           {!rateOk && needed !== null && (
-            <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">min. {fmtRate(needed)} potrzebne</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">min. {fmtRate(needed)} potrzebne</div>
           )}
         </td>
         <td className="px-4 py-3">
@@ -143,6 +143,7 @@ export function ProfitabilityPage() {
         {/* Filtry */}
         <div className="flex items-center gap-3 flex-wrap">
           <select
+            aria-label="Rok"
             value={year}
             onChange={e => setYear(Number(e.target.value))}
             className="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
@@ -152,6 +153,7 @@ export function ProfitabilityPage() {
             ))}
           </select>
           <select
+            aria-label="Miesiąc"
             value={month ?? ''}
             onChange={e => setMonth(e.target.value ? Number(e.target.value) : undefined)}
             className="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
@@ -197,7 +199,7 @@ export function ProfitabilityPage() {
             <div key={label} className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
               <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{label}</div>
               <div className="text-xl font-bold text-gray-900 dark:text-gray-100">{value}</div>
-              <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">{sub}</div>
+              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{sub}</div>
             </div>
           ))}
         </div>
@@ -205,14 +207,14 @@ export function ProfitabilityPage() {
 
       {/* Loading / Error */}
       {isLoading && (
-        <div className="text-center py-16 text-gray-400 dark:text-gray-500">Ładowanie danych…</div>
+        <div className="text-center py-16 text-gray-500 dark:text-gray-400">Ładowanie danych…</div>
       )}
       {isError && (
         <div className="text-center py-16 text-red-500">Błąd ładowania danych.</div>
       )}
 
       {data && data.clients.length === 0 && (
-        <div className="text-center py-16 text-gray-400 dark:text-gray-500">
+        <div className="text-center py-16 text-gray-500 dark:text-gray-400">
           Brak faktur ani wpisów czasowych w tym okresie.
         </div>
       )}
@@ -268,7 +270,7 @@ export function ProfitabilityPage() {
             <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800">
               <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                 Szczegóły per klient
-                <span className="ml-2 text-xs font-normal text-gray-400">
+                <span className="ml-2 text-xs font-normal text-gray-500 dark:text-gray-400">
                   (kliknij wiersz, aby rozwinąć projekty)
                 </span>
               </h2>
@@ -301,7 +303,7 @@ export function ProfitabilityPage() {
                     <td className="px-4 py-3 text-right text-gray-900 dark:text-gray-100">{fmt(data.totalRevenuePln)}</td>
                     <td className="px-4 py-3 text-right text-gray-900 dark:text-gray-100">{fmtH(data.totalBillableHours)}</td>
                     <td className="px-4 py-3 text-right text-gray-900 dark:text-gray-100">{fmtRate(data.overallEffectiveRate)}</td>
-                    <td className="px-4 py-3 text-xs text-gray-400 dark:text-gray-500">100%</td>
+                    <td className="px-4 py-3 text-xs text-gray-500 dark:text-gray-400">100%</td>
                     <td className="px-4 py-3 text-center text-gray-900 dark:text-gray-100">
                       {data.clients.reduce((s, c) => s + c.invoiceCount, 0)}
                     </td>
@@ -340,7 +342,7 @@ export function ProfitabilityPage() {
                       ) : (
                         <div className="text-gray-600 dark:text-gray-300">
                           Brakuje <span className="font-semibold text-red-600 dark:text-red-400">{fmt(gap)}</span>
-                          <div className="text-xs text-gray-400 mt-0.5">
+                          <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                             Potrzeba {fmt(targetRevenue)} za {fmtH(c.billableHours)}
                           </div>
                         </div>

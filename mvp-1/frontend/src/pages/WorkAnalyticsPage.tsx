@@ -53,7 +53,7 @@ function WorkHeatmap({ days, year }: { days: DayWork[]; year: number }) {
         <div className="flex flex-col gap-0.5 mr-1 justify-start">
           <div className="h-4" /> {/* odstęp na miesiące */}
           {DAY_LABELS.map(l => (
-            <div key={l} className="h-3 text-[9px] text-gray-400 dark:text-gray-500 leading-3 w-5 text-right pr-1">{l}</div>
+            <div key={l} className="h-3 text-[9px] text-gray-500 dark:text-gray-400 leading-3 w-5 text-right pr-1">{l}</div>
           ))}
         </div>
 
@@ -67,7 +67,7 @@ function WorkHeatmap({ days, year }: { days: DayWork[]; year: number }) {
 
           return (
             <div key={wi} className="flex flex-col gap-0.5">
-              <div className="h-4 text-[9px] text-gray-400 dark:text-gray-500 whitespace-nowrap leading-4">
+              <div className="h-4 text-[9px] text-gray-500 dark:text-gray-400 whitespace-nowrap leading-4">
                 {showMonth}
               </div>
               {week.map((day, di) => {
@@ -144,6 +144,7 @@ export function WorkAnalyticsPage() {
           <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Analiza czasu pracy</h1>
         </div>
         <select
+          aria-label="Rok"
           value={year}
           onChange={e => setYear(Number(e.target.value))}
           className="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
@@ -175,7 +176,7 @@ export function WorkAnalyticsPage() {
       )}
 
       {isLoading && (
-        <div className="text-center py-16 text-gray-400 dark:text-gray-500">Ładowanie danych…</div>
+        <div className="text-center py-16 text-gray-500 dark:text-gray-400">Ładowanie danych…</div>
       )}
       {isError && (
         <div className="text-center py-16 text-red-500">Błąd ładowania danych.</div>
@@ -212,7 +213,7 @@ export function WorkAnalyticsPage() {
               <div key={label} className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
                 <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{label}</div>
                 <div className={`text-xl font-bold ${color ?? 'text-gray-900 dark:text-gray-100'}`}>{value}</div>
-                <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">{sub}</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{sub}</div>
               </div>
             ))}
           </div>
@@ -249,7 +250,7 @@ export function WorkAnalyticsPage() {
                     {value}
                   </div>
                   <div className="text-xs font-medium text-gray-600 dark:text-gray-300">{label}</div>
-                  <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{note}</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{note}</div>
                 </div>
               ))}
             </div>

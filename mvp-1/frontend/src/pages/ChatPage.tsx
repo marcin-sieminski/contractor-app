@@ -321,6 +321,7 @@ export function ChatPage() {
                 <label className="text-xs text-gray-500 dark:text-gray-400 font-medium">Model</label>
                 <div className="relative">
                   <select
+                    aria-label="Model"
                     value={selectedModel}
                     onChange={e => { setSelectedModel(e.target.value); setToolsSupported(true) }}
                     disabled={isStreaming}
@@ -335,7 +336,7 @@ export function ChatPage() {
                   <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
                 </div>
                 {currentModel && currentModel.size > 0 && (
-                  <span className="text-[10px] text-gray-400 dark:text-gray-500">{formatSize(currentModel.size)}</span>
+                  <span className="text-[10px] text-gray-500 dark:text-gray-400">{formatSize(currentModel.size)}</span>
                 )}
               </div>
             )}
@@ -363,7 +364,7 @@ export function ChatPage() {
             <div className="space-y-3">
               {SUGGESTION_GROUPS.map(group => (
                 <div key={group.title}>
-                  <div className="text-[11px] font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-1.5">
+                  <div className="text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1.5">
                     {group.title}
                   </div>
                   <div className="flex flex-wrap gap-1.5">
@@ -405,6 +406,7 @@ export function ChatPage() {
       <form onSubmit={handleSend} className="flex gap-2 mt-4">
         <textarea
           ref={textareaRef}
+          aria-label="Wiadomość do asystenta"
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -419,7 +421,7 @@ export function ChatPage() {
             onClick={handleCancel}
             className="bg-red-500 text-white hover:bg-red-600 px-4 py-2 rounded-lg font-medium flex items-center gap-2 self-end"
           >
-            <X size={16} /> Anuluj
+            <X size={16} aria-hidden="true" /> Anuluj
           </button>
         ) : (
           <button
@@ -427,7 +429,7 @@ export function ChatPage() {
             disabled={!input.trim()}
             className="bg-blue-600 text-white hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed px-4 py-2 rounded-lg font-medium flex items-center gap-2 self-end"
           >
-            <Send size={16} /> Wyślij
+            <Send size={16} aria-hidden="true" /> Wyślij
           </button>
         )}
       </form>
@@ -455,7 +457,7 @@ function ConversationSidebar({ conversations, activeId, onSelect, onNew, onDelet
       </div>
       <div className="flex-1 overflow-y-auto px-2 pb-3 space-y-1">
         {conversations.length === 0 && (
-          <p className="text-xs text-gray-400 dark:text-gray-500 px-2 py-4 text-center">Brak zapisanych rozmów.</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 px-2 py-4 text-center">Brak zapisanych rozmów.</p>
         )}
         {conversations.map(c => (
           <div
@@ -467,14 +469,15 @@ function ConversationSidebar({ conversations, activeId, onSelect, onNew, onDelet
                 : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
             }`}
           >
-            <MessageSquare size={14} className="shrink-0 opacity-60" />
+            <MessageSquare size={14} className="shrink-0 opacity-60" aria-hidden="true" />
             <span className="flex-1 truncate" title={c.title}>{c.title}</span>
             <button
               onClick={e => { e.stopPropagation(); onDelete(c.id) }}
-              className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 transition-opacity"
+              aria-label="Usuń rozmowę"
+              className="opacity-0 group-hover:opacity-100 focus:opacity-100 text-gray-500 hover:text-red-500 transition-opacity"
               title="Usuń rozmowę"
             >
-              <Trash2 size={14} />
+              <Trash2 size={14} aria-hidden="true" />
             </button>
           </div>
         ))}
@@ -575,7 +578,7 @@ function MessageBubble({ message, onConfirm, onCancel, confirming, streaming }: 
       {hasTools && (
         <div className="mt-2 pt-2 border-t border-gray-200 dark:border-gray-600">
           <div className="flex flex-wrap items-center gap-1.5">
-            <span className="text-[11px] text-gray-400 dark:text-gray-500 flex items-center gap-1">
+            <span className="text-[11px] text-gray-500 dark:text-gray-400 flex items-center gap-1">
               <Wrench size={11} /> Użyto:
             </span>
             {message.toolCalls!.map((tc, i) => (
@@ -589,7 +592,7 @@ function MessageBubble({ message, onConfirm, onCancel, confirming, streaming }: 
           </div>
 
           <details className="mt-2 text-xs">
-            <summary className="cursor-pointer text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 select-none">
+            <summary className="cursor-pointer text-gray-500 dark:text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 select-none">
               Szczegóły wywołań
             </summary>
             <div className="mt-2 space-y-2">
@@ -618,7 +621,7 @@ function MessageBubble({ message, onConfirm, onCancel, confirming, streaming }: 
               Narzędzie: <span className="font-mono">{toolLabel(message.pendingAction.tool)}</span>
             </div>
             <details className="mt-1 text-xs">
-              <summary className="cursor-pointer text-gray-400 dark:text-gray-500 select-none">Parametry</summary>
+              <summary className="cursor-pointer text-gray-500 dark:text-gray-400 select-none">Parametry</summary>
               <pre className="text-[10px] overflow-x-auto mt-1 text-gray-700 dark:text-gray-300">{JSON.stringify(message.pendingAction.args, null, 2)}</pre>
             </details>
             <div className="flex gap-2 mt-2">

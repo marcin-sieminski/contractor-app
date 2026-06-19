@@ -125,16 +125,16 @@ export function DocumentsPage() {
           disabled={downloading || !data}
           className="inline-flex items-center gap-1.5 text-sm px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors disabled:opacity-50"
         >
-          <Download size={15} />
+          <Download size={15} aria-hidden="true" />
           {downloading ? 'Generowanie…' : 'Pobierz PDF'}
         </button>
       </div>
 
       {isLoading && !data && (
-        <div className="text-gray-400 dark:text-gray-500 text-sm py-12 text-center">Ładowanie…</div>
+        <div className="text-gray-500 dark:text-gray-400 text-sm py-12 text-center">Ładowanie…</div>
       )}
       {isError && (
-        <div className="text-red-500 text-sm py-12 text-center">Nie udało się pobrać dokumentu.</div>
+        <div role="alert" className="text-red-500 text-sm py-12 text-center">Nie udało się pobrać dokumentu.</div>
       )}
 
       {data && (
@@ -142,13 +142,13 @@ export function DocumentsPage() {
           <div className="flex items-baseline justify-between flex-wrap gap-2">
             <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{data.title}</h2>
             {!data.hasData && (
-              <span className="text-xs text-gray-400 dark:text-gray-500">
+              <span className="text-xs text-gray-500 dark:text-gray-400">
                 Brak faktur i wydatków w wybranym roku — wartości zerowe.
               </span>
             )}
           </div>
 
-          {downloadError && <div className="text-sm text-red-600 dark:text-red-400">{downloadError}</div>}
+          {downloadError && <div role="alert" className="text-sm text-red-600 dark:text-red-400">{downloadError}</div>}
 
           {data.dataWarnings.length > 0 && (
             <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl p-4 space-y-1">

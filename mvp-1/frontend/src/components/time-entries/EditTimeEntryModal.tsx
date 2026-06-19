@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useState, useId } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { updateTimeEntry } from '../../api/timeEntries'
 import { getProjects } from '../../api/clients'
 import { useClientNameById } from '../../hooks/useClientNameById'
 import { shortClientName } from '../../lib/clientName'
+import { useDialogClose } from '../../hooks/useDialogClose'
 import { format } from 'date-fns'
 import type { TimeEntry } from '../../types/timeEntry'
 
@@ -13,6 +14,8 @@ interface Props {
 }
 
 export function EditTimeEntryModal({ entry, onClose }: Props) {
+  const titleId = useId()
+  useDialogClose(onClose)
   const qc = useQueryClient()
   const { data: projects = [] } = useQuery({ queryKey: ['projects'], queryFn: () => getProjects() })
   const clientNameById = useClientNameById()
@@ -42,10 +45,11 @@ export function EditTimeEntryModal({ entry, onClose }: Props) {
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 w-full max-w-md">
-        <h2 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Edytuj wpis</h2>
+      <div role="dialog" aria-modal="true" aria-labelledby={titleId} className="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 w-full max-w-md">
+        <h2 id={titleId} className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Edytuj wpis</h2>
         <div className="space-y-3">
           <select
+            aria-label="Projekt"
             value={form.projectId}
             onChange={e => setForm(f => ({ ...f, projectId: e.target.value }))}
             className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
@@ -62,6 +66,7 @@ export function EditTimeEntryModal({ entry, onClose }: Props) {
           </select>
           <input
             type="date"
+            aria-label="Data"
             value={form.date}
             onChange={e => setForm(f => ({ ...f, date: e.target.value }))}
             className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
@@ -69,13 +74,15 @@ export function EditTimeEntryModal({ entry, onClose }: Props) {
           <div className="flex gap-2">
             <input
               type="time"
+              aria-label="Godzina rozpoczęcia"
               value={form.startTime}
               onChange={e => setForm(f => ({ ...f, startTime: e.target.value }))}
               className="flex-1 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
             />
-            <span className="self-center text-gray-400 dark:text-gray-500">—</span>
+            <span aria-hidden="true" className="self-center text-gray-400 dark:text-gray-500">—</span>
             <input
               type="time"
+              aria-label="Godzina zakończenia"
               value={form.endTime}
               onChange={e => setForm(f => ({ ...f, endTime: e.target.value }))}
               className="flex-1 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
@@ -83,13 +90,14 @@ export function EditTimeEntryModal({ entry, onClose }: Props) {
           </div>
           <input
             type="text"
+            aria-label="Opis"
             placeholder="Opis (opcjonalnie)"
             value={form.description}
             onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
             className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
           />
           {mutation.isError && (
-            <p className="text-red-600 dark:text-red-400 text-xs">{(mutation.error as Error)?.message ?? 'Błąd zapisu.'}</p>
+            <p role="alert" className="text-red-600 dark:text-red-400 text-xs">{(mutation.error as Error)?.message ?? 'Błąd zapisu.'}</p>
           )}
         </div>
         <div className="flex gap-2 mt-4 justify-end">

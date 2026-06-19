@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useId } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { AlertTriangle, CheckCircle2, Clock, Plus, Trash2, XCircle } from 'lucide-react'
 import { deleteTaxPayment, getTaxObligations, recordTaxPayment } from '../api/taxObligations'
@@ -40,6 +40,7 @@ interface AddPaymentFormProps {
 
 function AddPaymentForm({ year, month, monthName, onClose }: AddPaymentFormProps) {
   const qc = useQueryClient()
+  const baseId = useId()
   const [type, setType] = useState<TaxPaymentType>('ZusSocial')
   const [amount, setAmount] = useState('')
   const [paidAt, setPaidAt] = useState(new Date().toISOString().slice(0, 10))
@@ -66,8 +67,9 @@ function AddPaymentForm({ year, month, monthName, onClose }: AddPaymentFormProps
       </p>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         <div>
-          <label className="text-xs text-gray-500 dark:text-gray-400">Rodzaj</label>
+          <label htmlFor={`${baseId}-type`} className="text-xs text-gray-500 dark:text-gray-400">Rodzaj</label>
           <select
+            id={`${baseId}-type`}
             className="mt-0.5 w-full border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
             value={type}
             onChange={e => setType(e.target.value as TaxPaymentType)}
@@ -78,8 +80,9 @@ function AddPaymentForm({ year, month, monthName, onClose }: AddPaymentFormProps
           </select>
         </div>
         <div>
-          <label className="text-xs text-gray-500 dark:text-gray-400">Kwota (PLN)</label>
+          <label htmlFor={`${baseId}-amount`} className="text-xs text-gray-500 dark:text-gray-400">Kwota (PLN)</label>
           <input
+            id={`${baseId}-amount`}
             type="number"
             min="0"
             step="0.01"
@@ -90,8 +93,9 @@ function AddPaymentForm({ year, month, monthName, onClose }: AddPaymentFormProps
           />
         </div>
         <div>
-          <label className="text-xs text-gray-500 dark:text-gray-400">Data wpłaty</label>
+          <label htmlFor={`${baseId}-date`} className="text-xs text-gray-500 dark:text-gray-400">Data wpłaty</label>
           <input
+            id={`${baseId}-date`}
             type="date"
             value={paidAt}
             onChange={e => setPaidAt(e.target.value)}
@@ -99,8 +103,9 @@ function AddPaymentForm({ year, month, monthName, onClose }: AddPaymentFormProps
           />
         </div>
         <div>
-          <label className="text-xs text-gray-500 dark:text-gray-400">Uwagi</label>
+          <label htmlFor={`${baseId}-notes`} className="text-xs text-gray-500 dark:text-gray-400">Uwagi</label>
           <input
+            id={`${baseId}-notes`}
             type="text"
             value={notes}
             onChange={e => setNotes(e.target.value)}
@@ -194,7 +199,7 @@ function MonthRow({ month, year }: MonthRowProps) {
               <div key={label} className="bg-white dark:bg-gray-800/50 rounded-lg p-3 border border-gray-100 dark:border-gray-700">
                 <div className="text-xs text-gray-500 dark:text-gray-400">{label}</div>
                 <div className="font-semibold text-gray-900 dark:text-gray-100">{fmt(due)}</div>
-                <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">termin: {dueDate}</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">termin: {dueDate}</div>
                 {paid > 0 && (
                   <div className="text-xs text-green-600 dark:text-green-400 mt-1">zapł.: {fmt(paid)}</div>
                 )}
@@ -216,15 +221,16 @@ function MonthRow({ month, year }: MonthRowProps) {
                   >
                     <span className="text-gray-500 dark:text-gray-400 w-28">{PAYMENT_TYPE_LABELS[p.type]}</span>
                     <span className="font-medium text-gray-900 dark:text-gray-100">{fmt(p.amount)}</span>
-                    {p.paidAt && <span className="text-gray-400 text-xs">{p.paidAt}</span>}
-                    {p.notes && <span className="text-gray-400 text-xs italic truncate">{p.notes}</span>}
+                    {p.paidAt && <span className="text-gray-500 dark:text-gray-400 text-xs">{p.paidAt}</span>}
+                    {p.notes && <span className="text-gray-500 dark:text-gray-400 text-xs italic truncate">{p.notes}</span>}
                     <button
                       onClick={() => deleteMutation.mutate(p.id)}
                       disabled={deleteMutation.isPending}
-                      className="ml-auto text-red-400 hover:text-red-600 transition-colors disabled:opacity-40"
+                      className="ml-auto text-red-500 hover:text-red-600 transition-colors disabled:opacity-40"
+                      aria-label="Usuń wpłatę"
                       title="Usuń wpłatę"
                     >
-                      <Trash2 size={14} />
+                      <Trash2 size={14} aria-hidden="true" />
                     </button>
                   </div>
                 ))}
@@ -259,6 +265,7 @@ function MonthRow({ month, year }: MonthRowProps) {
 
 export function TaxObligationsPage() {
   const currentYear = new Date().getFullYear()
+  const filterId = useId()
   const [year, setYear] = useState(currentYear)
   const [taxForm, setTaxForm] = useState<TaxFormKey>('liniowy')
   const [zusStage, setZusStage] = useState<ZusStageKey>('pelny')
@@ -285,8 +292,9 @@ export function TaxObligationsPage() {
         </div>
         <div className="flex flex-wrap gap-3 ml-auto">
           <div className="flex flex-col">
-            <label className="text-xs text-gray-500 dark:text-gray-400">Rok</label>
+            <label htmlFor={`${filterId}-year`} className="text-xs text-gray-500 dark:text-gray-400">Rok</label>
             <select
+              id={`${filterId}-year`}
               className={selectCls}
               value={year}
               onChange={e => setYear(Number(e.target.value))}
@@ -297,8 +305,9 @@ export function TaxObligationsPage() {
             </select>
           </div>
           <div className="flex flex-col">
-            <label className="text-xs text-gray-500 dark:text-gray-400">Forma</label>
+            <label htmlFor={`${filterId}-form`} className="text-xs text-gray-500 dark:text-gray-400">Forma</label>
             <select
+              id={`${filterId}-form`}
               className={selectCls}
               value={taxForm}
               onChange={e => setTaxForm(e.target.value as TaxFormKey)}
@@ -309,8 +318,9 @@ export function TaxObligationsPage() {
             </select>
           </div>
           <div className="flex flex-col">
-            <label className="text-xs text-gray-500 dark:text-gray-400">Etap ZUS</label>
+            <label htmlFor={`${filterId}-zus`} className="text-xs text-gray-500 dark:text-gray-400">Etap ZUS</label>
             <select
+              id={`${filterId}-zus`}
               className={selectCls}
               value={zusStage}
               onChange={e => setZusStage(e.target.value as ZusStageKey)}
@@ -360,10 +370,10 @@ export function TaxObligationsPage() {
 
       {/* Miesięczna lista */}
       {isLoading && (
-        <div className="text-center py-12 text-gray-400">Ładowanie…</div>
+        <div className="text-center py-12 text-gray-500 dark:text-gray-400">Ładowanie…</div>
       )}
       {isError && (
-        <div className="text-center py-12 text-red-500">Błąd ładowania danych.</div>
+        <div role="alert" className="text-center py-12 text-red-500">Błąd ładowania danych.</div>
       )}
       {data && (
         <div className="space-y-2">

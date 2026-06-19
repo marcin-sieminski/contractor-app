@@ -24,6 +24,7 @@ export function TimerWidget() {
   return (
     <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 flex items-center gap-3">
       <select
+        aria-label="Projekt"
         value={projectId}
         onChange={e => setProjectId(e.target.value)}
         className="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 outline-none"
@@ -40,6 +41,7 @@ export function TimerWidget() {
       </select>
       <input
         type="text"
+        aria-label="Opis"
         placeholder="Opis (opcjonalnie)"
         value={description}
         onChange={e => setDescription(e.target.value)}
@@ -51,7 +53,7 @@ export function TimerWidget() {
         disabled={!projectId || isStarting}
         className="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-lg font-medium flex items-center gap-2 disabled:opacity-50"
       >
-        <Play size={16} /> Start
+        <Play size={16} aria-hidden="true" /> Start
       </button>
     </div>
   )

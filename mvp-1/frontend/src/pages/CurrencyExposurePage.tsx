@@ -72,18 +72,18 @@ function BreakdownCard({ b }: { b: CurrencyBreakdown }) {
           {fmtForeign(b.totalNetForeign, b.currency)}
         </div>
       )}
-      <div className="text-xs text-gray-400 dark:text-gray-500">{b.invoiceCount} {b.invoiceCount === 1 ? 'faktura' : 'faktur'}</div>
+      <div className="text-xs text-gray-500 dark:text-gray-400">{b.invoiceCount} {b.invoiceCount === 1 ? 'faktura' : 'faktur'}</div>
       {isForeign && b.avgExchangeRate > 0 && (
         <div className="mt-2 pt-2 border-t border-gray-100 dark:border-gray-800 text-xs space-y-1">
           <div className="flex justify-between text-gray-500 dark:text-gray-400">
             <span>Kurs avg</span>
             <span className="font-mono">{fmtRate(b.avgExchangeRate)}</span>
           </div>
-          <div className="flex justify-between text-gray-400 dark:text-gray-500">
+          <div className="flex justify-between text-gray-500 dark:text-gray-400">
             <span>Min / Max</span>
             <span className="font-mono">{fmtRate(b.minExchangeRate)} / {fmtRate(b.maxExchangeRate)}</span>
           </div>
-          <div className="flex justify-between text-gray-400 dark:text-gray-500">
+          <div className="flex justify-between text-gray-500 dark:text-gray-400">
             <span>Zmienność kursu</span>
             <span className={`font-mono ${b.maxExchangeRate - b.minExchangeRate > 0.2 ? 'text-amber-500' : 'text-gray-400'}`}>
               ±{fmtRate(b.maxExchangeRate - b.minExchangeRate)}
@@ -156,6 +156,7 @@ export function CurrencyExposurePage() {
           </div>
         </div>
         <select
+          aria-label="Rok"
           value={year}
           onChange={e => setYear(Number(e.target.value))}
           className="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
@@ -166,11 +167,11 @@ export function CurrencyExposurePage() {
         </select>
       </div>
 
-      {isLoading && <div className="text-center py-16 text-gray-400">Ładowanie danych…</div>}
-      {isError && <div className="text-center py-16 text-red-500">Błąd ładowania danych.</div>}
+      {isLoading && <div className="text-center py-16 text-gray-500 dark:text-gray-400">Ładowanie danych…</div>}
+      {isError && <div role="alert" className="text-center py-16 text-red-500">Błąd ładowania danych.</div>}
 
       {data && data.breakdown.length === 0 && (
-        <div className="text-center py-16 text-gray-400">Brak faktur w tym roku.</div>
+        <div className="text-center py-16 text-gray-500 dark:text-gray-400">Brak faktur w tym roku.</div>
       )}
 
       {data && data.breakdown.length > 0 && (
@@ -185,7 +186,7 @@ export function CurrencyExposurePage() {
               <div key={label} className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
                 <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{label}</div>
                 <div className={`text-xl font-bold ${color ?? 'text-gray-900 dark:text-gray-100'}`}>{value}</div>
-                <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">{sub}</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{sub}</div>
               </div>
             ))}
           </div>
@@ -234,7 +235,7 @@ export function CurrencyExposurePage() {
             <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">
               Miesięczny przychód wg waluty vs. kurs EUR/PLN (NBP)
             </h2>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mb-4">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
               Słupki = przychód w PLN per waluta; linia = średni kurs EUR z tabeli NBP (prawa oś)
             </p>
             <ResponsiveContainer width="100%" height={260}>
@@ -297,7 +298,7 @@ export function CurrencyExposurePage() {
                 <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                   Analiza wrażliwości — wpływ zmiany kursów na roczny przychód PLN
                 </h2>
-                <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                   Symulacja przy założeniu równoczesnej zmiany wszystkich kursów walutowych o ten sam %.
                 </p>
               </div>
@@ -328,7 +329,7 @@ export function CurrencyExposurePage() {
                           >
                             {row.changePercent > 0 ? '+' : ''}{row.changePercent}%
                           </span>
-                          {row.changePercent === 0 && <span className="ml-2 text-xs text-gray-400">(bieżący)</span>}
+                          {row.changePercent === 0 && <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">(bieżący)</span>}
                         </td>
                         {data.breakdown.filter(b => b.currency !== 'PLN').map(b => {
                           const impact = b.currency === 'EUR' ? row.eurImpact
@@ -367,6 +368,7 @@ export function CurrencyExposurePage() {
                     </label>
                     <input
                       type="range"
+                      aria-label="Zmiana kursów (%)"
                       min={-50}
                       max={50}
                       step={1}

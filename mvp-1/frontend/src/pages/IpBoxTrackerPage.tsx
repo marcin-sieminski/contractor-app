@@ -35,7 +35,7 @@ function KpiCard({ label, value, sub, icon: Icon, color }: {
       <div>
         <div className="text-xs text-gray-500 dark:text-gray-400">{label}</div>
         <div className="text-xl font-bold text-gray-900 dark:text-gray-100 mt-0.5">{value}</div>
-        {sub && <div className="text-xs text-gray-400 mt-0.5">{sub}</div>}
+        {sub && <div className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{sub}</div>}
       </div>
     </div>
   )
@@ -109,6 +109,7 @@ export function IpBoxTrackerPage() {
         </div>
         <div className="flex items-center gap-3">
           <select
+            aria-label="Rok"
             value={year}
             onChange={e => setYear(Number(e.target.value))}
             className="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
@@ -119,14 +120,14 @@ export function IpBoxTrackerPage() {
             onClick={() => downloadCsv(year)}
             className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm rounded-lg transition-colors"
           >
-            <Download size={16} />
+            <Download size={16} aria-hidden="true" />
             Eksportuj CSV
           </button>
         </div>
       </div>
 
       {isLoading && (
-        <div className="text-center py-20 text-gray-400">Ładowanie danych IP Box…</div>
+        <div className="text-center py-20 text-gray-500 dark:text-gray-400">Ładowanie danych IP Box…</div>
       )}
 
       {error && (
@@ -257,9 +258,11 @@ export function IpBoxTrackerPage() {
                           {m.ipHours > 0 && (
                             <button
                               onClick={() => downloadCsv(year, m.month)}
-                              className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+                              aria-label="Eksportuj CSV miesiąca"
+                              title="Eksportuj CSV miesiąca"
+                              className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-200"
                             >
-                              <Download size={14} />
+                              <Download size={14} aria-hidden="true" />
                             </button>
                           )}
                         </td>
@@ -304,6 +307,7 @@ export function IpBoxTrackerPage() {
                   </div>
                   <div className="flex gap-2">
                     <input
+                      aria-label="Opis kwalifikujący"
                       value={editDesc}
                       onChange={e => setEditDesc(e.target.value)}
                       placeholder="np. Implementacja algorytmu rekomendacji w module AI, wytworzenie kodu źródłowego"

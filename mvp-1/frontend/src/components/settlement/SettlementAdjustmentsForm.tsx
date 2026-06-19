@@ -30,7 +30,7 @@ export function SettlementAdjustmentsForm({ prefill, adjustments, disabled, onCh
     <div className="space-y-4">
       <section className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
         <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">Dane z aplikacji</h2>
-        <p className="text-xs text-gray-400 dark:text-gray-500 mb-4">
+        <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
           Sumy roczne z faktur (bez szkiców) i wydatków. Pozostaw pole korekty puste, aby użyć danych z aplikacji.
         </p>
         <div className="grid sm:grid-cols-2 gap-4">
@@ -59,7 +59,7 @@ export function SettlementAdjustmentsForm({ prefill, adjustments, disabled, onCh
         <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-1">
           Składki i zaliczki zapłacone w roku (metoda kasowa)
         </h2>
-        <p className="text-xs text-gray-400 dark:text-gray-500 mb-4">
+        <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
           W zeznaniu uwzględnia się kwoty faktycznie zapłacone w roku podatkowym — zweryfikuj z przelewami.
           Podpowiedzi wyliczono ze stawek dla wybranego roku i etapu ZUS.
         </p>
@@ -120,7 +120,7 @@ function AmountField({ label, hint, value, placeholder, disabled, onChange, onRe
             className="inline-flex items-center gap-0.5 text-[11px] text-blue-600 dark:text-blue-400 hover:underline"
             title="Przywróć wartość wyliczoną"
           >
-            <RotateCcw size={11} /> przywróć wyliczone
+            <RotateCcw size={11} aria-hidden="true" /> przywróć wyliczone
           </button>
         )}
       </span>
@@ -134,7 +134,7 @@ function AmountField({ label, hint, value, placeholder, disabled, onChange, onRe
         onChange={e => onChange(e.target.value)}
         className={inputCls}
       />
-      <span className="text-[11px] text-gray-400 dark:text-gray-500">{hint}</span>
+      <span className="text-[11px] text-gray-500 dark:text-gray-400">{hint}</span>
     </label>
   )
 }

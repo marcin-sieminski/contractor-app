@@ -233,8 +233,8 @@ export function ForecastPage() {
         )}
       </div>
 
-      {isLoading && <div className="text-gray-400 dark:text-gray-500 text-sm py-12 text-center">Ładowanie…</div>}
-      {isError && <div className="text-red-500 text-sm py-12 text-center">Nie udało się pobrać danych.</div>}
+      {isLoading && <div className="text-gray-500 dark:text-gray-400 text-sm py-12 text-center">Ładowanie…</div>}
+      {isError && <div role="alert" className="text-red-500 text-sm py-12 text-center">Nie udało się pobrać danych.</div>}
 
       {data && (
         <>
@@ -277,7 +277,7 @@ export function ForecastPage() {
                 {includeForecast ? `Prognoza miesięczna ${data.year}` : `Dane rzeczywiste ${data.year}`}
               </span>
               <div className="flex items-center gap-3">
-                <span className="text-xs text-gray-400 dark:text-gray-500 hidden sm:inline">
+                <span className="text-xs text-gray-500 dark:text-gray-400 hidden sm:inline">
                   {!includeForecast
                     ? data.monthsWithData > 0
                       ? `${data.monthsWithData} mies. z danymi`
@@ -305,7 +305,7 @@ export function ForecastPage() {
                           }`}
                           title={`Skopiuj przychody i koszty z ${year - 1}`}
                         >
-                          <CopyPlus size={13} /> Przenieś z {year - 1}
+                          <CopyPlus size={13} aria-hidden="true" /> Przenieś z {year - 1}
                         </button>
                         <button
                           onClick={clearForecast}
@@ -317,7 +317,7 @@ export function ForecastPage() {
                           }`}
                           title="Wyzeruj dane prognozy"
                         >
-                          <Eraser size={13} /> Wyczyść dane
+                          <Eraser size={13} aria-hidden="true" /> Wyczyść dane
                         </button>
                       </>
                     )}
@@ -328,7 +328,7 @@ export function ForecastPage() {
                         className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
                         title="Porzuć niezapisane zmiany"
                       >
-                        <RotateCcw size={13} /> Cofnij zmiany
+                        <RotateCcw size={13} aria-hidden="true" /> Cofnij zmiany
                       </button>
                     )}
                     <button
@@ -340,7 +340,7 @@ export function ForecastPage() {
                           : 'border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'
                       }`}
                     >
-                      <Pencil size={13} /> {editMode ? (saveMutation.isPending ? 'Zapisywanie…' : 'Gotowe') : 'Edytuj prognozę'}
+                      <Pencil size={13} aria-hidden="true" /> {editMode ? (saveMutation.isPending ? 'Zapisywanie…' : 'Gotowe') : 'Edytuj prognozę'}
                     </button>
                   </>
                 )}
@@ -348,7 +348,7 @@ export function ForecastPage() {
             </div>
 
             {data.months.length === 0 ? (
-              <div className="px-4 py-8 text-center text-sm text-gray-400 dark:text-gray-500">
+              <div className="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
                 Brak danych rzeczywistych w wybranym roku.
               </div>
             ) : (
@@ -387,6 +387,7 @@ export function ForecastPage() {
                           {editable ? (
                             <input
                               type="number"
+                              aria-label={`Przychód — ${m.monthName}`}
                               min={0}
                               value={revenueOverrides[m.month] ?? m.revenue}
                               onChange={e => updateOverride('revenue', m.month, e.target.value)}
@@ -398,6 +399,7 @@ export function ForecastPage() {
                           {editable ? (
                             <input
                               type="number"
+                              aria-label={`Koszty — ${m.monthName}`}
                               min={0}
                               value={costOverrides[m.month] ?? m.costs}
                               onChange={e => updateOverride('cost', m.month, e.target.value)}
@@ -458,7 +460,7 @@ function Kpi({ label, value, color, sub }: { label: string; value: string; color
     <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
       <div className="text-gray-500 dark:text-gray-400 text-sm mb-1">{label}</div>
       <div className={`text-2xl font-bold ${color}`}>{value}</div>
-      {sub && <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">{sub}</div>}
+      {sub && <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{sub}</div>}
     </div>
   )
 }

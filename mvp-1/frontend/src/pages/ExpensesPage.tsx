@@ -43,14 +43,14 @@ export function ExpensesPage() {
           <div className="text-2xl font-bold text-red-500">
             {totalPLN.toLocaleString('pl-PL', { maximumFractionDigits: 2 })} PLN
           </div>
-          <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">{filtered.length} pozycji</div>
+          <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{filtered.length} pozycji</div>
         </div>
         <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
           <div className="text-gray-500 dark:text-gray-400 text-sm mb-1">Z odliczeniem VAT</div>
           <div className="text-2xl font-bold text-green-600">
             {vatDeductiblePLN.toLocaleString('pl-PL', { maximumFractionDigits: 2 })} PLN
           </div>
-          <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+          <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
             {filtered.filter(e => e.isVatDeductible).length} pozycji
           </div>
         </div>
@@ -59,7 +59,7 @@ export function ExpensesPage() {
           <div className="text-2xl font-bold text-gray-700 dark:text-gray-200">
             {(totalPLN - vatDeductiblePLN).toLocaleString('pl-PL', { maximumFractionDigits: 2 })} PLN
           </div>
-          <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+          <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
             {filtered.filter(e => !e.isVatDeductible).length} pozycji
           </div>
         </div>
@@ -67,6 +67,7 @@ export function ExpensesPage() {
 
       <div className="flex items-center gap-3 mb-4">
         <select
+          aria-label="Filtruj wg kategorii"
           value={categoryFilter}
           onChange={e => setCategoryFilter(e.target.value)}
           className="border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
@@ -77,7 +78,7 @@ export function ExpensesPage() {
           ))}
         </select>
         {categoryFilter && (
-          <button onClick={() => setCategoryFilter('')} className="text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300">
+          <button onClick={() => setCategoryFilter('')} className="text-xs text-gray-500 dark:text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
             Wyczyść filtr
           </button>
         )}
@@ -85,7 +86,7 @@ export function ExpensesPage() {
 
       <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
         {isLoading
-          ? <div className="text-gray-400 dark:text-gray-500 text-sm p-6 text-center">Ładowanie...</div>
+          ? <div className="text-gray-500 dark:text-gray-400 text-sm p-6 text-center">Ładowanie...</div>
           : <ExpenseList expenses={filtered} />
         }
       </div>
