@@ -121,7 +121,7 @@ export function SettlementPage() {
   }
 
   return (
-    <div className="p-6 max-w-5xl">
+    <div className="p-6 max-w-7xl mx-auto">
       <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
         <div className="flex items-center gap-2">
           <FileCheck className="text-blue-600" size={24} />

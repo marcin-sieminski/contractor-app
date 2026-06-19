@@ -279,7 +279,7 @@ export function TaxObligationsPage() {
   const due = data?.months.filter(m => m.status === 'due') ?? []
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
+    <div className="p-6 max-w-7xl mx-auto">
       {/* Nagłówek */}
       <div className="flex flex-wrap items-end gap-4 mb-6">
         <div>

@@ -62,7 +62,7 @@ export function DocumentsPage() {
   const sumCol = data ? summaryIndex(data) : 0
 
   return (
-    <div className="p-6 max-w-6xl">
+    <div className="p-6 max-w-7xl mx-auto">
       <div className="flex items-center gap-2 mb-6">
         <FileSpreadsheet className="text-blue-600" size={24} />
         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Dokumenty</h1>

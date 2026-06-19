@@ -23,7 +23,7 @@ const nav = [
 ]
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-  `flex items-center gap-3 px-3 min-h-11 py-2 rounded-lg text-sm font-medium transition-colors ${
+  `flex items-center gap-3 px-3 min-h-9 py-1.5 rounded-lg text-sm font-medium transition-colors ${
     isActive
       ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400'
       : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
@@ -54,7 +54,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
         </NavLink>
         <button
           onClick={() => { onNavigate?.(); logout() }}
-          className="flex items-center gap-3 px-3 min-h-11 py-2 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 w-full transition-colors"
+          className="flex items-center gap-3 px-3 min-h-9 py-1.5 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 w-full transition-colors"
         >
           <LogOut size={18} />
           Wyloguj
