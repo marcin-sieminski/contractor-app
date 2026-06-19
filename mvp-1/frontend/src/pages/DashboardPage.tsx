@@ -9,6 +9,10 @@ import { RevenueByClientChart } from '../components/dashboard/RevenueByClientCha
 import { RevenueByMonthChart } from '../components/dashboard/RevenueByMonthChart'
 import { ExpensesByMonthChart } from '../components/dashboard/ExpensesByMonthChart'
 import { ExpensesByCategoryChart } from '../components/dashboard/ExpensesByCategoryChart'
+import { NetProfitByMonthChart } from '../components/dashboard/NetProfitByMonthChart'
+import { TaxFormComparisonChart } from '../components/dashboard/TaxFormComparisonChart'
+import { UpcomingObligationsWidget } from '../components/dashboard/UpcomingObligationsWidget'
+import { CashFlowMiniChart } from '../components/dashboard/CashFlowMiniChart'
 import { ExpenseMonthDetailModal } from '../components/dashboard/ExpenseMonthDetailModal'
 import { ExpenseCategoryDetailModal } from '../components/dashboard/ExpenseCategoryDetailModal'
 import { MonthDetailModal } from '../components/dashboard/MonthDetailModal'
@@ -216,6 +220,24 @@ export function DashboardPage() {
           selectedCategory={selectedExpenseCategory}
           onCategoryClick={label => setSelectedExpenseCategory(label)}
         />
+      </div>
+
+      {/* Rentowność */}
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">Rentowność i podatki</span>
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+        <NetProfitByMonthChart revenuePoints={invoicedPoints} expenses={expenses} />
+        <TaxFormComparisonChart />
+      </div>
+
+      {/* Płynność */}
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">Płynność</span>
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+        <CashFlowMiniChart />
+        <UpcomingObligationsWidget />
       </div>
 
       <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
