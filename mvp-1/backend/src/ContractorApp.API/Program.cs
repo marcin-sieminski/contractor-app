@@ -47,7 +47,6 @@ builder.Services.AddCors(opts =>
 
 var app = builder.Build();
 
-// Auto-migrate on startup in development
 if (app.Environment.IsDevelopment())
 {
     using var scope = app.Services.CreateScope();
@@ -66,4 +65,5 @@ if (app.Environment.IsDevelopment())
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
 app.Run();

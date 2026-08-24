@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xsd:schema xmlns:etd="http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:zwt="http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/09/02/eD/PITWOT/" targetNamespace="http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2025/09/02/eD/PITWOT/" elementFormDefault="qualified" attributeFormDefault="unqualified" xml:lang="pl">
+	<xsd:import namespace="http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/" schemaLocation="http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/StrukturyDanych_v12-0E.xsd"/>
+	<!--Załącznik do zeznań: PIT-36, PIT-36S, PIT-36L i PIT-36LS.-->
+	<!-- -->
+	<!--Wypełniają podatnicy korzystający z odliczenia od podstawy obliczenia podatku, na zasadach określonych w art. 26he ustawy.-->
+	<!-- -->
+	<!--Małżonkowie, bez względu na sposób rozliczenia rocznego (indywidualnie czy wspólnie z małżonkiem), składają odrębny załącznik PIT/WOT.-->
+	<xsd:complexType name="TNaglowek_PIT_WOT">
+		<xsd:annotation>
+			<xsd:documentation>Nagłówek deklaracji</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="KodFormularza">
+				<xsd:complexType>
+					<xsd:simpleContent>
+						<xsd:extension base="zwt:TKodFormularza_PIT_WOT">
+							<xsd:attribute name="kodSystemowy" type="xsd:string" use="required" fixed="PITWOT (1)"/>
+							<xsd:attribute name="wersjaSchemy" type="xsd:string" use="required" fixed="1-0E"/>
+						</xsd:extension>
+					</xsd:simpleContent>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="WariantFormularza">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:byte">
+						<xsd:enumeration value="1"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:simpleType name="TKodFormularza_PIT_WOT">
+		<xsd:annotation>
+			<xsd:documentation>Symbol wzoru formularza</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="PIT/WOT"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:element name="Zalacznik_PIT_WOT">
+		<xsd:annotation>
+			<xsd:documentation>Informacja o odliczeniach z tytułu zatrudnienia żołnierzy terytorialnej służby wojskowej lub żołnierzy aktywnej rezerwy</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="Naglowek" type="zwt:TNaglowek_PIT_WOT"/>
+				<xsd:element name="Podmiot1" type="etd:TIdentyfikatorOsobyFizycznej2"/>
+				<xsd:element name="PozycjeSzczegolowe">
+					<xsd:annotation>
+						<xsd:documentation>Dane o żołnierzach terytorialnej służby wojskowej lub żołnierzach aktywnej rezerwy, razem przysługujące odliczenie z tytułu zatrudnienia w roku podatkowym żołnierzy terytorialnej służby wojskowej lub żołnierzy aktywnej rezerwy</xsd:documentation>
+					</xsd:annotation>
+					<xsd:complexType>
+						<xsd:sequence>
+							<!--A. Dane identyfikacyjne podatnika i inne informacje o podatniku-->
+							<!-- -->
+							<!--Podatnik będący wspólnikiem spółki niebędącej osobą prawną, która zatrudniała żołnierzy terytorialnej służby wojskowej lub żołnierzy aktywnej rezerwy, w poz. 7-10 wskazuje status tej spółki.-->
+							<xsd:sequence>
+								<xsd:element name="P_7" type="etd:TWybor1" minOccurs="0">
+									<xsd:annotation>
+										<xsd:documentation>Podatnik był w roku podatkowym mikroprzedsiębiorcą: 1 - tak</xsd:documentation>
+									</xsd:annotation>
+									<!--Mikroprzedsiębiorca w rozumieniu art. 7 ust. 1 pkt 1 ustawy z dnia 6 marca 2018 r. – Prawo przedsiębiorców, zwanej dalej „Prawem przedsiębiorców”.-->
+								</xsd:element>
+								<xsd:element name="P_8" type="etd:TWybor1" minOccurs="0">
+									<xsd:annotation>
+										<xsd:documentation>Podatnik był w roku podatkowym małym przedsiębiorcą: 1 - tak</xsd:documentation>
+									</xsd:annotation>
+									<!--Mały przedsiębiorca w rozumieniu art. 7 ust. 1 pkt 2 Prawa przedsiębiorców.-->
+								</xsd:element>
+								<xsd:element name="P_9" type="etd:TWybor1" minOccurs="0">
+									<xsd:annotation>
+										<xsd:documentation>Podatnik był w roku podatkowym przedsiębiorcą, który zatrudniał co najmniej 5 pracowników i nie był mikroprzedsiębiorcą lub małym przedsiębiorcą: 1 - tak</xsd:documentation>
+									</xsd:annotation>
+									<!--Przedsiębiorca, który przez cały rok podatkowy zatrudniał w ramach stosunku pracy co najmniej 5 pracowników, w przeliczeniu na pełne etaty, który nie był mikroprzedsiębiorcą lub małym przedsiębiorcą.-->
+								</xsd:element>
+								<xsd:element name="P_10" type="etd:TWybor1" minOccurs="0">
+									<xsd:annotation>
+										<xsd:documentation>Podatnik był w roku podatkowym innym przedsiębiorcą: 1 - tak</xsd:documentation>
+									</xsd:annotation>
+								</xsd:element>
+							</xsd:sequence>
+							<!--B. Dane o żołnierzach terytorialnej służby wojskowej lub żołnierzach aktywnej rezerwy-->
+							<xsd:element name="P_B" maxOccurs="unbounded">
+								<xsd:annotation>
+									<xsd:documentation>Dane o żołnierzach terytorialnej służby wojskowej lub żołnierzach aktywnej rezerwy</xsd:documentation>
+								</xsd:annotation>
+								<!--Należy podać numer PESEL żołnierzy terytorialnej służby wojskowej lub żołnierzy aktywnej rezerwy, liczbę miesięcy i lat nieprzerwanej służby w terytorialnej służbie wojskowej lub w aktywnej rezerwie, okres zatrudnienia w roku podatkowym.-->
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:annotation>
+											<xsd:documentation>Dane o żołnierzu</xsd:documentation>
+										</xsd:annotation>
+										<xsd:element name="P_B11" type="etd:TNrPESEL">
+											<xsd:annotation>
+												<xsd:documentation>PESEL</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+										<xsd:sequence>
+											<xsd:element name="P_B12_1" minOccurs="0">
+												<xsd:annotation>
+													<xsd:documentation>Liczba lat nieprzerwanej służby w terytorialnej służbie wojskowej lub w aktywnej rezerwie</xsd:documentation>
+												</xsd:annotation>
+												<!--Okres służby żołnierza terytorialnej służby wojskowej lub żołnierza aktywnej rezerwy, ustala się na dzień 31 grudnia roku podatkowego albo ostatni dzień zatrudnienia tego żołnierza w roku podatkowym.-->
+												<xsd:simpleType>
+													<xsd:restriction base="etd:TCalkowity">
+														<xsd:maxInclusive value="99"/>
+													</xsd:restriction>
+												</xsd:simpleType>
+											</xsd:element>
+											<xsd:element name="P_B12_2" minOccurs="0">
+												<xsd:annotation>
+													<xsd:documentation>Liczba miesięcy nieprzerwanej służby w terytorialnej służbie wojskowej lub w aktywnej rezerwie</xsd:documentation>
+												</xsd:annotation>
+												<!--Okres służby żołnierza terytorialnej służby wojskowej lub żołnierza aktywnej rezerwy, ustala się na dzień 31 grudnia roku podatkowego albo ostatni dzień zatrudnienia tego żołnierza w roku podatkowym.-->
+												<xsd:simpleType>
+													<xsd:restriction base="etd:TMiesiac">
+														<xsd:maxInclusive value="11"/>
+													</xsd:restriction>
+												</xsd:simpleType>
+											</xsd:element>
+										</xsd:sequence>
+										<xsd:element name="P_B13" type="etd:TWybor1_2">
+											<xsd:annotation>
+												<xsd:documentation>Okres zatrudnienia w ramach stosunku pracy żołnierza terytorialnej służby wojskowej lub aktywnej rezerwy w roku podatkowym: 1 - cały rok, 2 - niepełny rok</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+										<xsd:element name="P_B14" minOccurs="0">
+											<xsd:annotation>
+												<xsd:documentation>Liczba miesięcy kalendarzowych zatrudnienia w roku podatkowym (w przypadku zaznaczenia w poz. 13 kwadratu nr 2 należy podać liczbę pełnych miesięcy kalendarzowych zatrudnienia w ramach stosunku pracy żołnierza)</xsd:documentation>
+											</xsd:annotation>
+											<xsd:simpleType>
+												<xsd:restriction base="etd:TMiesiac">
+													<xsd:maxInclusive value="11"/>
+												</xsd:restriction>
+											</xsd:simpleType>
+										</xsd:element>
+										<xsd:element name="P_B15">
+											<xsd:annotation>
+												<xsd:documentation>Przysługujące odliczenie z tytułu zatrudnienia w roku podatkowym żołnierza terytorialnej służby wojskowej lub żołnierza aktywnej rezerwy</xsd:documentation>
+											</xsd:annotation>
+											<!--W poz. 15:
+- uwzględnia się zwiększenia, o których mowa w art. 26he ust. 3 i 4 ustawy,
+- nie uwzględnia się wartości nieodliczonej ulgi w poprzednich latach podlegającej odliczeniu w roku podatkowym, na podstawie art. 26he ust. 5 ustawy.-->
+											<!-- -->
+											<!--Podatnik będący wspólnikiem spółki niebędącej osobą prawną wykazuje kwotę odliczenia stosownie do swojego udziału.-->
+											<xsd:simpleType>
+												<xsd:restriction base="etd:TKwota2Nieujemna">
+													<xsd:maxInclusive value="36000"/>
+												</xsd:restriction>
+											</xsd:simpleType>
+										</xsd:element>
+									</xsd:sequence>
+									<xsd:attribute name="typ" use="required" fixed="G"/>
+								</xsd:complexType>
+							</xsd:element>
+							<!--C. Razem przysługujące odliczenie z tytułu zatrudnienia w roku podatkowym żołnierzy terytorialnej służby wojskowej lub żołnierzy aktywnej rezerwy-->
+							<xsd:element name="P_16" type="etd:TKwota2Nieujemna">
+								<xsd:annotation>
+									<xsd:documentation>Razem przysługujące odliczenie</xsd:documentation>
+								</xsd:annotation>
+								<!--Suma kwot z poz. 15 części B-->
+							</xsd:element>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

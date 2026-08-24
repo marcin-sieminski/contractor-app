@@ -3,5 +3,37 @@
 @tailwind utilities;
 
 body {
-  @apply bg-gray-50 text-gray-900;
+  @apply bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100;
+}
+
+html.gray body {
+  filter: grayscale(0.65) brightness(0.92);
+}
+
+/* Counteract the parent filter on charts so they stay colorful.
+   With grayscale(0.65) the remaining saturation is 0.35×.
+   saturate(2.86) × 0.35 ≈ 1× — restores original chart colors.
+   brightness(1/0.92 ≈ 1.087) compensates the parent dim. */
+html.gray .recharts-responsive-container {
+  filter: saturate(2.86) brightness(1.087);
+}
+
+/* "Nowoczesny" — ciepły, jasny schemat. Pojedynczy filtr na body przesuwa
+   cały interfejs (wraz z wykresami) w stronę jasnej, ciepłej, złocistej palety,
+   utrzymując ciemny, czytelny tekst na kremowym tle. W przeciwieństwie do
+   schematu szarego NIE neutralizujemy wykresów — mają być ciepłe jak reszta UI. */
+html.modern body {
+  filter: sepia(0.45) saturate(1.55) hue-rotate(-12deg) brightness(1.03);
+}
+
+/* Szanuj preferencję ograniczenia ruchu (WCAG 2.3.3 / 2.2.2). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

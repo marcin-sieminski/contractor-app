@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useId } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { getInvoiceById, updateInvoice } from '../../api/invoices'
+import { useDialogClose } from '../../hooks/useDialogClose'
 import { X, Plus, Trash2 } from 'lucide-react'
 
 interface Props {
@@ -41,6 +42,8 @@ interface LineItemForm {
 }
 
 export function InvoiceEditModal({ invoiceId, onClose, onSaved }: Props) {
+  const titleId = useId()
+  useDialogClose(onClose)
   const qc = useQueryClient()
   const { data: invoice, isLoading } = useQuery({
     queryKey: ['invoice', invoiceId],
@@ -118,38 +121,38 @@ export function InvoiceEditModal({ invoiceId, onClose, onSaved }: Props) {
   const totalGross = totalNet * (1 + vatRate)
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col">
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-0 sm:p-4">
+      <div role="dialog" aria-modal="true" aria-labelledby={titleId} className="bg-white shadow-2xl w-full h-full sm:h-auto max-w-none sm:max-w-2xl max-h-none sm:max-h-[90vh] rounded-none sm:rounded-xl flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <h2 className="text-lg font-semibold">
+          <h2 id={titleId} className="text-lg font-semibold">
             Edytuj fakturę {invoice?.invoiceNumber}
           </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 p-1">
-            <X size={20} />
+          <button onClick={onClose} aria-label="Zamknij" className="text-gray-500 hover:text-gray-700 p-1">
+            <X size={20} aria-hidden="true" />
           </button>
         </div>
 
         <div className="overflow-y-auto flex-1 px-6 py-4 space-y-5">
-          {isLoading && <div className="text-gray-400 text-center py-8">Ładowanie...</div>}
+          {isLoading && <div className="text-gray-500 text-center py-8">Ładowanie...</div>}
 
           {initialized && (
             <>
               {/* Dates */}
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="text-xs text-gray-500 mb-1 block">Data wystawienia</label>
-                  <input type="date" value={issueDate} onChange={e => setIssueDate(e.target.value)}
+                  <label htmlFor={`${titleId}-issue`} className="text-xs text-gray-500 mb-1 block">Data wystawienia</label>
+                  <input id={`${titleId}-issue`} type="date" value={issueDate} onChange={e => setIssueDate(e.target.value)}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none" />
                 </div>
                 <div>
-                  <label className="text-xs text-gray-500 mb-1 block">Data sprzedaży</label>
-                  <input type="date" value={serviceDate} onChange={e => setServiceDate(e.target.value)}
+                  <label htmlFor={`${titleId}-service`} className="text-xs text-gray-500 mb-1 block">Data sprzedaży</label>
+                  <input id={`${titleId}-service`} type="date" value={serviceDate} onChange={e => setServiceDate(e.target.value)}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none" />
                 </div>
                 <div>
-                  <label className="text-xs text-gray-500 mb-1 block">Termin płatności</label>
-                  <input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)}
+                  <label htmlFor={`${titleId}-due`} className="text-xs text-gray-500 mb-1 block">Termin płatności</label>
+                  <input id={`${titleId}-due`} type="date" value={dueDate} onChange={e => setDueDate(e.target.value)}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none" />
                 </div>
               </div>
@@ -157,15 +160,15 @@ export function InvoiceEditModal({ invoiceId, onClose, onSaved }: Props) {
               {/* VAT & Currency */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs text-gray-500 mb-1 block">Traktowanie VAT</label>
-                  <select value={vatTreatment} onChange={e => setVatTreatment(Number(e.target.value))}
+                  <label htmlFor={`${titleId}-vat`} className="text-xs text-gray-500 mb-1 block">Traktowanie VAT</label>
+                  <select id={`${titleId}-vat`} value={vatTreatment} onChange={e => setVatTreatment(Number(e.target.value))}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none">
                     {VAT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs text-gray-500 mb-1 block">Waluta</label>
-                  <select value={currency} onChange={e => setCurrency(Number(e.target.value))}
+                  <label htmlFor={`${titleId}-currency`} className="text-xs text-gray-500 mb-1 block">Waluta</label>
+                  <select id={`${titleId}-currency`} value={currency} onChange={e => setCurrency(Number(e.target.value))}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 outline-none">
                     {CURRENCY_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                   </select>
@@ -178,7 +181,7 @@ export function InvoiceEditModal({ invoiceId, onClose, onSaved }: Props) {
                   <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Pozycje</span>
                   <button onClick={addLine}
                     className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-800 px-2 py-1 rounded hover:bg-blue-50">
-                    <Plus size={12} /> Dodaj pozycję
+                    <Plus size={12} aria-hidden="true" /> Dodaj pozycję
                   </button>
                 </div>
 
@@ -187,37 +190,38 @@ export function InvoiceEditModal({ invoiceId, onClose, onSaved }: Props) {
                     <div key={idx} className="bg-gray-50 rounded-lg p-3 space-y-2">
                       <div className="flex gap-2">
                         <input
+                          aria-label={`Opis usługi (pozycja ${idx + 1})`}
                           placeholder="Opis usługi"
                           value={l.description}
                           onChange={e => updateLine(idx, 'description', e.target.value)}
                           className="flex-1 border border-gray-300 rounded px-2 py-1.5 text-sm focus:ring-2 focus:ring-blue-400 outline-none"
                         />
                         {lines.length > 1 && (
-                          <button onClick={() => removeLine(idx)} className="text-gray-400 hover:text-red-500 flex-shrink-0">
-                            <Trash2 size={14} />
+                          <button onClick={() => removeLine(idx)} aria-label={`Usuń pozycję ${idx + 1}`} className="text-gray-500 hover:text-red-500 flex-shrink-0">
+                            <Trash2 size={14} aria-hidden="true" />
                           </button>
                         )}
                       </div>
                       <div className="flex gap-2 items-center">
                         <div className="flex-1">
-                          <label className="text-xs text-gray-400">Ilość</label>
-                          <input type="number" value={l.quantity} min="0" step="0.01"
+                          <label htmlFor={`${titleId}-qty-${idx}`} className="text-xs text-gray-500">Ilość</label>
+                          <input id={`${titleId}-qty-${idx}`} type="number" value={l.quantity} min="0" step="0.01"
                             onChange={e => updateLine(idx, 'quantity', e.target.value)}
                             className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm font-mono focus:ring-2 focus:ring-blue-400 outline-none" />
                         </div>
                         <div className="w-20">
-                          <label className="text-xs text-gray-400">Jedn.</label>
-                          <input value={l.unit} onChange={e => updateLine(idx, 'unit', e.target.value)}
+                          <label htmlFor={`${titleId}-unit-${idx}`} className="text-xs text-gray-500">Jedn.</label>
+                          <input id={`${titleId}-unit-${idx}`} value={l.unit} onChange={e => updateLine(idx, 'unit', e.target.value)}
                             className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm focus:ring-2 focus:ring-blue-400 outline-none" />
                         </div>
                         <div className="flex-1">
-                          <label className="text-xs text-gray-400">Cena / jedn.</label>
-                          <input type="number" value={l.unitPrice} min="0" step="0.01"
+                          <label htmlFor={`${titleId}-price-${idx}`} className="text-xs text-gray-500">Cena / jedn.</label>
+                          <input id={`${titleId}-price-${idx}`} type="number" value={l.unitPrice} min="0" step="0.01"
                             onChange={e => updateLine(idx, 'unitPrice', e.target.value)}
                             className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm font-mono focus:ring-2 focus:ring-blue-400 outline-none" />
                         </div>
                         <div className="flex-1 text-right">
-                          <label className="text-xs text-gray-400">Netto</label>
+                          <span className="text-xs text-gray-500">Netto</span>
                           <div className="text-sm font-mono font-medium pt-1.5">
                             {previewNet(l).toFixed(2)}
                           </div>
@@ -231,7 +235,7 @@ export function InvoiceEditModal({ invoiceId, onClose, onSaved }: Props) {
                 <div className="mt-3 bg-blue-50 rounded-lg px-4 py-2 flex justify-between text-sm">
                   <span className="text-gray-600">
                     Netto: <span className="font-mono font-medium">{totalNet.toFixed(2)}</span>
-                    {vatRate > 0 && <span className="text-gray-400 ml-2 text-xs">(+ {(totalNet * vatRate).toFixed(2)} VAT)</span>}
+                    {vatRate > 0 && <span className="text-gray-500 ml-2 text-xs">(+ {(totalNet * vatRate).toFixed(2)} VAT)</span>}
                   </span>
                   <span className="font-semibold text-blue-800">
                     Brutto: <span className="font-mono">{totalGross.toFixed(2)} {CURRENCY_OPTIONS[currency]?.label}</span>

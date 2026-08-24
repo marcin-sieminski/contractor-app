@@ -10,4 +10,6 @@ public record TimeEntryDto(
     int? DurationMinutes,
     string Description,
     bool IsInvoiced,
-    bool IsRunning);
+    bool IsRunning,
+    bool IsPaused,
+    int AccumulatedSeconds);

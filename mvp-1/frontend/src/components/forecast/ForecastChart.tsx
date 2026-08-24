@@ -1,0 +1,84 @@
+import {
+  ComposedChart, Bar, Line, XAxis, YAxis, Tooltip, Legend,
+  ResponsiveContainer, CartesianGrid, ReferenceArea, Cell,
+} from 'recharts'
+import { useTheme } from '../../context/ThemeContext'
+import type { MonthForecast } from '../../types/forecast'
+
+interface Props {
+  months: MonthForecast[]
+  showForecastHint?: boolean
+}
+
+const fmt = (v: number) => v.toLocaleString('pl-PL', { maximumFractionDigits: 0 })
+
+export function ForecastChart({ months, showForecastHint = true }: Props) {
+  const { resolvedTheme } = useTheme()
+  const dark = resolvedTheme === 'dark'
+
+  const data = months.map(m => ({
+    label: m.monthName.slice(0, 3),
+    isActual: m.isActual,
+    Przychód: m.revenue,
+    Obciążenia: m.totalObligations,
+    'Przepływ netto': m.netCashFlow,
+  }))
+
+  const firstForecast = months.find(m => !m.isActual)
+  const lastMonth = months[months.length - 1]
+  const forecastFrom = firstForecast ? firstForecast.monthName.slice(0, 3) : null
+  const forecastTo = lastMonth ? lastMonth.monthName.slice(0, 3) : null
+
+  const tickColor = dark ? '#9ca3af' : '#6b7280'
+  const gridColor = dark ? '#374151' : '#f0f0f0'
+  const refAreaFill = dark ? '#1e293b' : '#f8fafc'
+  const tooltipStyle = dark
+    ? { fontSize: 12, borderRadius: 8, backgroundColor: '#1f2937', border: '1px solid #374151', color: '#f3f4f6' }
+    : { fontSize: 12, borderRadius: 8 }
+  const legendStyle = dark ? { fontSize: 12, color: '#d1d5db' } : { fontSize: 12 }
+
+  return (
+    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4">
+      <div className="flex items-center justify-between mb-4">
+        <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+          Przychód, obciążenia i przepływ netto
+        </span>
+        {showForecastHint && (
+          <span className="text-xs text-gray-400 dark:text-gray-500">jaśniejszy obszar = prognoza</span>
+        )}
+      </div>
+      <ResponsiveContainer width="100%" height={320}>
+        <ComposedChart data={data} margin={{ top: 4, right: 8, left: 8, bottom: 0 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
+          {forecastFrom && forecastTo && (
+            <ReferenceArea x1={forecastFrom} x2={forecastTo} fill={refAreaFill} fillOpacity={0.8} />
+          )}
+          <XAxis dataKey="label" tick={{ fontSize: 11, fill: tickColor }} axisLine={false} tickLine={false} />
+          <YAxis tickFormatter={fmt} tick={{ fontSize: 11, fill: tickColor }} axisLine={false} tickLine={false} width={70} />
+          <Tooltip
+            formatter={(value, name) => [fmt(Number(value ?? 0)) + ' PLN', name as string]}
+            contentStyle={tooltipStyle}
+          />
+          <Legend wrapperStyle={legendStyle} />
+          <Bar dataKey="Przychód" radius={[4, 4, 0, 0]} maxBarSize={28}>
+            {data.map((d, i) => (
+              <Cell key={i} fill={d.isActual ? '#3b82f6' : (dark ? '#1e40af' : '#93c5fd')} />
+            ))}
+          </Bar>
+          <Bar dataKey="Obciążenia" radius={[4, 4, 0, 0]} maxBarSize={28}>
+            {data.map((d, i) => (
+              <Cell key={i} fill={d.isActual ? '#ef4444' : (dark ? '#991b1b' : '#fca5a5')} />
+            ))}
+          </Bar>
+          <Line
+            type="monotone"
+            dataKey="Przepływ netto"
+            stroke="#16a34a"
+            strokeWidth={2}
+            dot={{ r: 3 }}
+          />
+        </ComposedChart>
+      </ResponsiveContainer>
+    </div>
+  )
+}

@@ -4,12 +4,16 @@ using ContractorApp.Infrastructure.Persistence;
 using ContractorApp.Infrastructure.Services;
 using ContractorApp.Infrastructure.Services.Auth;
 using ContractorApp.Infrastructure.Services.CompanyLookup;
+using ContractorApp.Infrastructure.Services.Declarations;
 using ContractorApp.Infrastructure.Services.KSeF;
 using ContractorApp.Infrastructure.Services.Nbp;
+using ContractorApp.Infrastructure.Services.Ocr;
+using ContractorApp.Infrastructure.Services.Pdf;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace ContractorApp.Infrastructure;
 
@@ -53,6 +57,18 @@ public static class DependencyInjection
         services.AddScoped<IKsefService, KsefService>();
         services.AddScoped<IKsefXmlBuilder, KsefXmlBuilder>();
 
+        // Deklaracje PIT (rozliczenie roczne): buildery XML + walidacja XSD
+        services.AddSingleton<DeclarationXsdValidator>();
+        services.AddScoped<IDeclarationXmlBuilder, Pit36XmlBuilder>();
+        services.AddScoped<IDeclarationXmlBuilder, Pit36LXmlBuilder>();
+        services.AddScoped<IDeclarationXmlBuilder, Pit28XmlBuilder>();
+        services.AddScoped<IDeclarationXmlBuilderFactory, DeclarationXmlBuilderFactory>();
+
+        // PDF rozliczenia rocznego i dokumentów finansowych (QuestPDF — licencja Community, przychód firmy < 1M USD)
+        QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
+        services.AddSingleton<ISettlementPdfGenerator, SettlementPdfGenerator>();
+        services.AddSingleton<IDocumentPdfGenerator, DocumentPdfGenerator>();
+
         // NBP
         services.AddHttpClient<NbpService>();
         services.AddScoped<INbpService, NbpService>();
@@ -60,6 +76,14 @@ public static class DependencyInjection
         // Company Lookup
         services.AddHttpClient<CompanyLookupService>();
         services.AddScoped<ICompanyLookupService, CompanyLookupService>();
+
+        // OCR paragonów/faktur (Claude Vision + fallback Ollama)
+        services.Configure<ReceiptOcrOptions>(configuration.GetSection("ReceiptOcr").Bind);
+        services.AddHttpClient<IReceiptExtractionService, ReceiptExtractionService>((sp, client) =>
+        {
+            var opts = sp.GetRequiredService<IOptions<ReceiptOcrOptions>>().Value;
+            client.Timeout = TimeSpan.FromSeconds(opts.TimeoutSeconds);
+        });
 
         return services;
     }

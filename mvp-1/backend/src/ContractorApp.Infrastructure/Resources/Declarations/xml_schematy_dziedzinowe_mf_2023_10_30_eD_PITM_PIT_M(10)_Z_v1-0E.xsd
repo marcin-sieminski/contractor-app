@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xsd:schema xmlns:etd="http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:zm="http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2023/10/30/eD/PITM/" targetNamespace="http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2023/10/30/eD/PITM/" elementFormDefault="qualified" attributeFormDefault="unqualified" xml:lang="pl">
+	<xsd:import namespace="http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/" schemaLocation="http://crd.gov.pl/xml/schematy/dziedzinowe/mf/2022/09/13/eD/DefinicjeTypy/StrukturyDanych_v12-0E.xsd"/>
+	<!--Załącznik do zeznania PIT-36.-->
+	<!-- -->
+	<!--Małżonkowie, bez względu na sposób rozliczenia rocznego (indywidualnie czy wspólnie z małżonkiem), składają odrębny załącznik PIT/M.-->
+	<xsd:complexType name="TNaglowek_PIT_M">
+		<xsd:annotation>
+			<xsd:documentation>Nagłówek deklaracji</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="KodFormularza">
+				<xsd:complexType>
+					<xsd:simpleContent>
+						<xsd:extension base="zm:TKodFormularza_PIT_M">
+							<xsd:attribute name="kodSystemowy" type="xsd:string" use="required" fixed="PIT/M (10)"/>
+							<xsd:attribute name="wersjaSchemy" type="xsd:string" use="required" fixed="1-0E"/>
+						</xsd:extension>
+					</xsd:simpleContent>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="WariantFormularza">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:byte">
+						<xsd:enumeration value="10"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:simpleType name="TKodFormularza_PIT_M">
+		<xsd:annotation>
+			<xsd:documentation>Symbol wzoru formularza</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="PIT/M"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:element name="Zalacznik_PIT_M">
+		<xsd:annotation>
+			<xsd:documentation>INFORMACJA O DOCHODACH MAŁOLETNICH DZIECI, PODLEGAJĄCYCH ŁĄCZNEMU OPODATKOWANIU Z DOCHODAMI RODZICÓW za rok podatkowy</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="Naglowek" type="zm:TNaglowek_PIT_M"/>
+				<xsd:element name="Podmiot1">
+					<xsd:complexType>
+						<xsd:complexContent>
+							<xsd:extension base="etd:TIdentyfikatorOsobyFizycznej1"/>
+						</xsd:complexContent>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="PozycjeSzczegolowe">
+					<xsd:annotation>
+						<xsd:documentation>Dochody małoletnich dzieci, podlegające łącznemu opodatkowaniu z dochodami rodziców, lub straty ze źródeł przychodów</xsd:documentation>
+					</xsd:annotation>
+					<xsd:complexType>
+						<xsd:sequence>
+							<!--B. DOCHODY MAŁOLETNICH DZIECI, PODLEGAJĄCE ŁĄCZNEMU OPODATKOWANIU Z DOCHODAMI RODZICÓW, LUB STRATY ZE ŹRÓDEŁ PRZYCHODÓW-->
+							<!-- -->
+							<!--B.1. DOCHODY / STRATY MAŁOLETNICH DZIECI-->
+							<!-- -->
+							<!--Wypełnia się, jeżeli prawo pobierania pożytków z dochodu dziecka (dzieci) przysługuje tylko jednemu z rodziców-->
+							<xsd:sequence>
+								<xsd:sequence minOccurs="0">
+									<xsd:sequence minOccurs="0">
+										<xsd:annotation>
+											<xsd:documentation>1. Prawa majątkowe</xsd:documentation>
+										</xsd:annotation>
+										<xsd:element name="P_6" type="etd:TKwota2Nieujemna">
+											<xsd:annotation>
+												<xsd:documentation>Przychód</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+										<xsd:element name="P_7" type="etd:TKwota2Nieujemna" minOccurs="0">
+											<xsd:annotation>
+												<xsd:documentation>Koszty uzyskania przychodów</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+										<xsd:element name="P_8" type="etd:TKwota2Nieujemna">
+											<xsd:annotation>
+												<xsd:documentation>Dochód</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+										<xsd:element name="P_9" type="etd:TKwota2Nieujemna" minOccurs="0">
+											<xsd:annotation>
+												<xsd:documentation>Strata</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+										<xsd:element name="P_10" type="etd:TKwotaCNieujemna">
+											<xsd:annotation>
+												<xsd:documentation>Należna zaliczka, w tym zaliczka pobrana przez płatnika (po zaokrągleniu do pełnych złotych)</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+									</xsd:sequence>
+									<xsd:sequence minOccurs="0">
+										<xsd:annotation>
+											<xsd:documentation>2. Inne źródła, niewymienione w wierszu 1</xsd:documentation>
+										</xsd:annotation>
+										<xsd:element name="P_11" type="etd:TKwota2Nieujemna">
+											<xsd:annotation>
+												<xsd:documentation>Przychód</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+										<xsd:element name="P_12" type="etd:TKwota2Nieujemna" minOccurs="0">
+											<xsd:annotation>
+												<xsd:documentation>Koszty uzyskania przychodów</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+										<xsd:element name="P_13" type="etd:TKwota2Nieujemna">
+											<xsd:annotation>
+												<xsd:documentation>Dochód</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+										<xsd:element name="P_14" type="etd:TKwota2Nieujemna" minOccurs="0">
+											<xsd:annotation>
+												<xsd:documentation>Strata</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+										<xsd:element name="P_15" type="etd:TKwotaCNieujemna">
+											<xsd:annotation>
+												<xsd:documentation>Należna zaliczka, w tym zaliczka pobrana przez płatnika (po zaokrągleniu do pełnych złotych)</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+									</xsd:sequence>
+									<xsd:sequence>
+										<xsd:annotation>
+											<xsd:documentation>3. RAZEM</xsd:documentation>
+										</xsd:annotation>
+										<!--Suma kwot z wierszy 1 i 2.-->
+										<xsd:element name="P_16" type="etd:TKwota2Nieujemna">
+											<xsd:annotation>
+												<xsd:documentation>Przychód</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+										<xsd:element name="P_17" type="etd:TKwota2Nieujemna" minOccurs="0">
+											<xsd:annotation>
+												<xsd:documentation>Koszty uzyskania przychodów</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+										<xsd:element name="P_18" type="etd:TKwota2Nieujemna">
+											<xsd:annotation>
+												<xsd:documentation>Dochód</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+										<xsd:element name="P_19" type="etd:TKwotaCNieujemna">
+											<xsd:annotation>
+												<xsd:documentation>Należna zaliczka, w tym zaliczka pobrana przez płatnika (po zaokrągleniu do pełnych złotych)</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+									</xsd:sequence>
+								</xsd:sequence>
+								<!--B.2. DOCHODY / STRATY MAŁOLETNICH DZIECI-->
+								<!-- -->
+								<!--Wypełnia się, jeżeli prawo pobierania pożytków z dochodu dziecka (dzieci) przysługuje obojgu rodzicom-->
+								<xsd:sequence minOccurs="0">
+									<xsd:sequence minOccurs="0">
+										<xsd:annotation>
+											<xsd:documentation>1. Prawa majątkowe</xsd:documentation>
+										</xsd:annotation>
+										<xsd:element name="P_20" type="etd:TKwota2Nieujemna">
+											<xsd:annotation>
+												<xsd:documentation>Przychód</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+										<xsd:element name="P_21" type="etd:TKwota2Nieujemna" minOccurs="0">
+											<xsd:annotation>
+												<xsd:documentation>Koszty uzyskania przychodów</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+										<xsd:element name="P_22" type="etd:TKwota2Nieujemna">
+											<xsd:annotation>
+												<xsd:documentation>Dochód</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+										<xsd:element name="P_23" type="etd:TKwota2Nieujemna" minOccurs="0">
+											<xsd:annotation>
+												<xsd:documentation>Strata</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+										<xsd:element name="P_24" type="etd:TKwotaCNieujemna">
+											<xsd:annotation>
+												<xsd:documentation>Należna zaliczka, w tym zaliczka pobrana przez płatnika (po zaokrągleniu do pełnych złotych)</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+									</xsd:sequence>
+									<xsd:sequence minOccurs="0">
+										<xsd:annotation>
+											<xsd:documentation>2. Inne źródła, niewymienione w wierszu 1</xsd:documentation>
+										</xsd:annotation>
+										<xsd:element name="P_25" type="etd:TKwota2Nieujemna">
+											<xsd:annotation>
+												<xsd:documentation>Przychód</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+										<xsd:element name="P_26" type="etd:TKwota2Nieujemna" minOccurs="0">
+											<xsd:annotation>
+												<xsd:documentation>Koszty uzyskania przychodów</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+										<xsd:element name="P_27" type="etd:TKwota2Nieujemna">
+											<xsd:annotation>
+												<xsd:documentation>Dochód</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+										<xsd:element name="P_28" type="etd:TKwota2Nieujemna" minOccurs="0">
+											<xsd:annotation>
+												<xsd:documentation>Strata</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+										<xsd:element name="P_29" type="etd:TKwotaCNieujemna">
+											<xsd:annotation>
+												<xsd:documentation>Należna zaliczka, w tym zaliczka pobrana przez płatnika (po zaokrągleniu do pełnych złotych)</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+									</xsd:sequence>
+									<xsd:sequence>
+										<xsd:annotation>
+											<xsd:documentation>3. RAZEM</xsd:documentation>
+										</xsd:annotation>
+										<!--W poz. 30-33 należy wpisać sumę kwot z wierszy 1 i 2.-->
+										<xsd:element name="P_30" type="etd:TKwota2Nieujemna">
+											<xsd:annotation>
+												<xsd:documentation>Przychód</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+										<xsd:element name="P_31" type="etd:TKwota2Nieujemna" minOccurs="0">
+											<xsd:annotation>
+												<xsd:documentation>Koszty uzyskania przychodów</xsd:documentation>
+											</xsd:annotation>
+										</xsd:element>
+										<xsd:sequence>
+											<xsd:element name="P_32" type="etd:TKwota2Nieujemna">
+												<xsd:annotation>
+													<xsd:documentation>Dochód</xsd:documentation>
+												</xsd:annotation>
+											</xsd:element>
+											<xsd:element name="P_34" type="etd:TKwota2Nieujemna">
+												<xsd:annotation>
+													<xsd:documentation>Dochód - połowa kwoty z poz. 32</xsd:documentation>
+												</xsd:annotation>
+												<!--W poz. 34 należy wpisać połowę kwoty z poz. 32.-->
+											</xsd:element>
+										</xsd:sequence>
+										<xsd:sequence>
+											<xsd:element name="P_33" type="etd:TKwotaCNieujemna">
+												<xsd:annotation>
+													<xsd:documentation>Należna zaliczka, w tym zaliczka pobrana przez płatnika (po zaokrągleniu do pełnych złotych)</xsd:documentation>
+												</xsd:annotation>
+											</xsd:element>
+											<xsd:element name="P_35" type="etd:TKwota2Nieujemna">
+												<xsd:annotation>
+													<xsd:documentation>Należna zaliczka, w tym zaliczka pobrana przez płatnika - połowa kwoty z poz. 33 (po zaokrągleniu do pełnych złotych - z wyjątkiem poz. 35)</xsd:documentation>
+												</xsd:annotation>
+												<!--W poz. 35 należy wpisać połowę kwoty z poz. 33.-->
+											</xsd:element>
+										</xsd:sequence>
+									</xsd:sequence>
+								</xsd:sequence>
+							</xsd:sequence>
+							<!--B.3. DOCHODY I NALEŻNA ZALICZKA OD DOCHODÓW MAŁOLETNICH DZIECI-->
+							<xsd:sequence>
+								<xsd:annotation>
+									<xsd:documentation>Dochody małoletnich dzieci podlegające łącznemu opodatkowaniu oraz należna zaliczka</xsd:documentation>
+								</xsd:annotation>
+								<!--Kwoty z poz. 36 i 37 należy przenieść do odpowiednich pozycji zeznania PIT-36.-->
+								<xsd:element name="P_36" type="etd:TKwota2Nieujemna">
+									<xsd:annotation>
+										<xsd:documentation>Dochód</xsd:documentation>
+									</xsd:annotation>
+									<!--W poz. 36 należy wpisać sumę kwot z poz. 18 i 34.-->
+								</xsd:element>
+								<xsd:element name="P_37" type="etd:TKwota2Nieujemna">
+									<xsd:annotation>
+										<xsd:documentation>Należna zaliczka</xsd:documentation>
+									</xsd:annotation>
+									<!--W poz. 37 należy wpisać sumę kwot z poz. 19 i 35.-->
+								</xsd:element>
+							</xsd:sequence>
+						</xsd:sequence>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

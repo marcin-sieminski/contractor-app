@@ -1,5 +1,6 @@
 using ContractorApp.Application.DTOs;
 using ContractorApp.Domain.Entities;
+using ContractorApp.Domain.Enums;
 
 namespace ContractorApp.Application;
 
@@ -16,7 +17,15 @@ public static class MappingExtensions
     public static TimeEntryDto ToDto(this TimeEntry t, string projectName, string clientName) => new(
         t.Id, t.ProjectId, projectName, clientName,
         t.StartedAt, t.StoppedAt, t.DurationMinutes, t.Description,
-        t.IsInvoiced, t.IsRunning);
+        t.IsInvoiced, t.IsRunning, t.IsPaused, t.AccumulatedSeconds);
+
+    public static ExpenseDto ToDto(this Expense e) => new(
+        e.Id, e.Date, e.Category.ToString(), e.Description,
+        e.Amount, e.Currency.ToString(), e.ExchangeRate, e.AmountPLN,
+        e.IsVatDeductible, e.ReceiptNumber,
+        e.VendorName, e.VendorNip, e.NetAmount, e.VatAmount,
+        e.ReceiptId, e.ReceiptId != null,
+        e.CreatedAt);
 
     public static InvoiceDto ToDto(this Invoice i) => new(
         i.Id, i.InvoiceNumber,

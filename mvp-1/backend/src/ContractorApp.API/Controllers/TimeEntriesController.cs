@@ -1,7 +1,10 @@
 using ContractorApp.Application.Features.TimeEntries.Commands.CreateManualEntry;
 using ContractorApp.Application.Features.TimeEntries.Commands.DeleteTimeEntry;
+using ContractorApp.Application.Features.TimeEntries.Commands.PauseTimer;
+using ContractorApp.Application.Features.TimeEntries.Commands.ResumeTimer;
 using ContractorApp.Application.Features.TimeEntries.Commands.StartTimer;
 using ContractorApp.Application.Features.TimeEntries.Commands.StopTimer;
+using ContractorApp.Application.Features.TimeEntries.Commands.UpdateTimeEntry;
 using ContractorApp.Application.Features.TimeEntries.Queries.GetActiveTimer;
 using ContractorApp.Application.Features.TimeEntries.Queries.GetTimeEntries;
 using Microsoft.AspNetCore.Mvc;
@@ -30,9 +33,21 @@ public class TimeEntriesController : BaseApiController
     public async Task<IActionResult> Stop(Guid id, CancellationToken ct)
         => Ok(await Mediator.Send(new StopTimerCommand(id), ct));
 
+    [HttpPost("{id:guid}/pause")]
+    public async Task<IActionResult> Pause(Guid id, CancellationToken ct)
+        => Ok(await Mediator.Send(new PauseTimerCommand(id), ct));
+
+    [HttpPost("{id:guid}/resume")]
+    public async Task<IActionResult> Resume(Guid id, CancellationToken ct)
+        => Ok(await Mediator.Send(new ResumeTimerCommand(id), ct));
+
     [HttpPost("manual")]
     public async Task<IActionResult> CreateManual([FromBody] CreateManualEntryCommand cmd, CancellationToken ct)
         => Ok(await Mediator.Send(cmd, ct));
+
+    [HttpPut("{id:guid}")]
+    public async Task<IActionResult> Update(Guid id, [FromBody] UpdateTimeEntryCommand cmd, CancellationToken ct)
+        => Ok(await Mediator.Send(cmd with { Id = id }, ct));
 
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id, CancellationToken ct)

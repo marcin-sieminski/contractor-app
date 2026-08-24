@@ -28,7 +28,7 @@ public class StopTimerCommandHandler : IRequestHandler<StopTimerCommand, TimeEnt
                 cancellationToken)
             ?? throw new DomainException($"Wpis czasu {request.TimeEntryId} nie istnieje.");
 
-        if (!entry.IsRunning)
+        if (entry.StoppedAt != null)
             throw new DomainException("Ten timer już jest zatrzymany.");
 
         entry.Stop(DateTimeOffset.UtcNow);

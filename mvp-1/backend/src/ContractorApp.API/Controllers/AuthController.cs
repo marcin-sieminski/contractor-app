@@ -20,7 +20,7 @@ public class AuthController : ControllerBase
 
     public record RegisterRequest(string Email, string Password, string ConfirmPassword);
     public record LoginRequest(string Email, string Password);
-    public record AuthResponse(string Token, string Email, DateTimeOffset ExpiresAt);
+    public record AuthResponse(string Token, string Email, DateTimeOffset ExpiresAt, string? DisplayName);
 
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
@@ -35,7 +35,7 @@ public class AuthController : ControllerBase
             return BadRequest(new { errors = result.Errors.Select(e => e.Description) });
 
         var (token, expiresAt) = _tokenService.GenerateToken(user);
-        return Ok(new AuthResponse(token, user.Email!, expiresAt));
+        return Ok(new AuthResponse(token, user.Email!, expiresAt, user.DisplayName));
     }
 
     [HttpPost("login")]
@@ -46,6 +46,6 @@ public class AuthController : ControllerBase
             return Unauthorized(new { error = "Nieprawidłowy email lub hasło." });
 
         var (token, expiresAt) = _tokenService.GenerateToken(user);
-        return Ok(new AuthResponse(token, user.Email!, expiresAt));
+        return Ok(new AuthResponse(token, user.Email!, expiresAt, user.DisplayName));
     }
 }

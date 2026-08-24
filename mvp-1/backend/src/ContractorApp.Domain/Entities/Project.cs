@@ -10,6 +10,7 @@ public class Project : Entity
     public decimal HourlyRate { get; set; }
     public Currency Currency { get; set; } = Currency.PLN;
     public bool IsActive { get; set; } = true;
+    public bool IsIpProject { get; set; } = false;
     public DateTimeOffset? DeletedAt { get; set; }
 
     public Client Client { get; set; } = null!;

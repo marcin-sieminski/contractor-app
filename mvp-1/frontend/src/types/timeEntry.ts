@@ -9,4 +9,6 @@ export interface TimeEntry {
   description: string
   isInvoiced: boolean
   isRunning: boolean
+  isPaused: boolean
+  accumulatedSeconds: number
 }
